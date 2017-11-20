@@ -17,10 +17,10 @@ public class AltetrnativeGameBoard : MonoBehaviour
 
     [Range(0, 6)]
     public int TargetTile;
-    [Range(0,7)]
+    [Range(0, 7)]
     [SerializeField]
     private int xSize = 7;
-    [Range(0,8)]
+    [Range(0, 8)]
     [SerializeField]
     private int ySize = 8;
     [SerializeField]
@@ -65,6 +65,7 @@ public class AltetrnativeGameBoard : MonoBehaviour
                 AlternativeTile.moveTo = null;
             }
         }
+        
     }
 
     public bool Checkifnear()
@@ -118,24 +119,6 @@ public class AltetrnativeGameBoard : MonoBehaviour
         board[sel.x, sel.y] = sel.ID;
         board[mov.x, mov.y] = mov.ID;
 
-    }
-
-    IEnumerator SwapPos(Transform obj1, Transform obj2, float time)
-    {
-        Vector3 tempPos1;
-        Vector3 tempPos2;
-        tempPos1 = obj1.position;
-        tempPos2 = obj2.position;
-        float t = 0;
-        while (t < 1)
-        {
-            t += Time.deltaTime / time;
-            obj1.position = Vector3.Lerp(obj1.position, tempPos2, t);
-            obj2.position = Vector3.Lerp(obj2.position, tempPos1, t);
-            yield return null;
-        }
-        obj1 = obj2.transform;
-        obj2 = obj1.transform;
     }
 
 
@@ -202,7 +185,7 @@ public class AltetrnativeGameBoard : MonoBehaviour
                     }
                 }
                 int randomNumberId = Random.Range(0, Tiles.Count); // Id
-                Transform obj = Instantiate(Tiles[randomNumberId].transform, new Vector3(x, y, 0), Quaternion.identity) as Transform;
+                Transform obj = Instantiate(Tiles[randomNumberId].transform, new Vector3(x, y), Quaternion.identity) as Transform;
 
                 Vector3 localScale = obj.localScale;
                 objectPos = new Vector3(x * (localScale.x), y * (localScale.y));
@@ -378,8 +361,6 @@ public class AltetrnativeGameBoard : MonoBehaviour
         return ArrayUtility.Contains<T>(values, x);
     }
 
-    [SerializeField]
-    GameObject gizmos;
 
     private void Respawn()
     {
@@ -387,52 +368,28 @@ public class AltetrnativeGameBoard : MonoBehaviour
         {
             for (int y = 0; y < ySize; y++)
             {
+                if (y + 1 >= ySize) continue;
+
+
                 if (board[x, y] == 500) // spawn on destroyed cell
                 {
-                    int randomNumberID = Random.Range(0, Tiles.Count); // Id
-                    Transform obj = (Instantiate(Tiles[randomNumberID].transform, new Vector3(x, y, 0), Quaternion.identity));
+                    //int randomNumberID = Random.Range(0, Tiles.Count); // Id
+                    //Transform obj = (Instantiate(Tiles[randomNumberID].transform, new Vector3(x, y), Quaternion.identity));
 
-                    CenteredTile(obj, x, y);
+                    //CenteredTile(obj, x, y);
 
-                    obj.parent = transform;
-                    AlternativeTile a = obj.gameObject.AddComponent<AlternativeTile>();
-                    goTiles.Add(a.transform);
-                    a.ID = randomNumberID;
-                    a.x = x;
-                    a.y = y;
-                    board[x, y] = randomNumberID;
+                    //obj.parent = transform;
+                    //AlternativeTile a = obj.gameObject.AddComponent<AlternativeTile>();
+                    //goTiles.Add(a.transform);
+                    //a.ID = randomNumberID;
+                    //a.x = x;
+                    //a.y = y;
+                    //board[x, y] = randomNumberID;
                 }
             }
         }
     }
-    // Перенести все передвижения в AlternativeTiles.
-    private IEnumerator ShiftTilesDown(int x, int yStart, float shiftDelay = .03f)
-    {
-        IsShifting = true;
-        List<Transform> _ts = new List<Transform>();
-        int nullCount = 0;
 
-        for (int y = yStart; y < ySize; y++)
-        {
-            Transform _t = DelTiles[x, y];
-            if (_t == null)
-            {
-                nullCount++;
-            }
-            _ts.Add(_t);
-        }
-        for (int i = 0; i < nullCount; i++)
-        {
-            yield return new WaitForSeconds(shiftDelay);
-            for (int k = 0; k < _ts.Count - 1; k++)
-            {
-                _ts[k] = _ts[k + 1];
-                _ts[k + 1] = null;
-            }
-        }
-
-        IsShifting = false;
-    }
     private void CenteredTile(Transform obj, int x, int y)
     {
         Vector3 localScale = obj.localScale;
