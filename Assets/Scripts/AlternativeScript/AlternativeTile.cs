@@ -34,6 +34,7 @@ public class AlternativeTile : MonoBehaviour
         selector = gameObject.transform.GetChild(0).gameObject;
         timer = Time.time;
     }
+    
 
     private void OnMouseOver()
     {

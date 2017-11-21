@@ -31,7 +31,7 @@ public class AltetrnativeGameBoard : MonoBehaviour
     private bool changingGrid = false;
 
 
-    [HideInInspector]
+
     public bool IsShifting = false;
 
     private void Awake()
@@ -39,7 +39,7 @@ public class AltetrnativeGameBoard : MonoBehaviour
         instance = GetComponent<AltetrnativeGameBoard>();
         CreateBoard(xSize, ySize, changingGridX, changingGridY, changingGrid);
     }
-    
+
 
     public bool Checkifnear()
     {
@@ -203,31 +203,27 @@ public class AltetrnativeGameBoard : MonoBehaviour
             }
         }
     }
-
-    [SerializeField]
     List<AlternativeTile> _ts = new List<AlternativeTile>();
-
     private IEnumerator ShiftTilesDown(int x, int yStart, float shiftDelay = .03f)
     {
-        IsShifting = true;
         
-        int nullCount = 0;
+        IsShifting = true;
 
         for (int y = yStart; y < ySize; y++)
         {
-            AlternativeTile _t = GetTileByGrid(x, y).gameObject.GetComponent<AlternativeTile>();
-            if (_t.x == 500)
-            {
-                nullCount++;
-            }
+            AlternativeTile _t = GetTileByGrid(x, y);
             _ts.Add(_t);
         }
-        for (int i = 0; i < nullCount; i++)
+
+        yield return new WaitForSeconds(shiftDelay);
+        for (int k = 0; k < _ts.Count; k++)
         {
-            yield return new WaitForSeconds(shiftDelay);
-            for (int k = 0; k < _ts.Count - 1; k++)
-            { 
-            
+            if (_ts[k] != null)
+            {
+                _ts[k].y--;
+                _ts[k].transform.position = new Vector3(_ts[k].transform.position.x, _ts[k].transform.position.y - 1);
+                board[_ts[k].x, _ts[k].y] = _ts[k].ID;
+                _ts[k] = null;
             }
         }
         IsShifting = false;
