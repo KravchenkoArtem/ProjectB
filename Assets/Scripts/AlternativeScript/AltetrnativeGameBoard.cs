@@ -7,9 +7,9 @@ using UnityEditor;
 public class AltetrnativeGameBoard : MonoBehaviour
 {
     public static AltetrnativeGameBoard instance;
-    public static int[,] board;
+    public int[,] board;
     public List<Transform> Tiles = new List<Transform>();
-    private List<Transform> goTiles = new List<Transform>();
+    public List<Transform> goTiles = new List<Transform>();
 
     private List<Vector3> test = new List<Vector3>();
 
@@ -39,60 +39,14 @@ public class AltetrnativeGameBoard : MonoBehaviour
         instance = GetComponent<AltetrnativeGameBoard>();
         CreateBoard(xSize, ySize, changingGridX, changingGridY, changingGrid);
     }
-
-    private void Update()
-    {
-        if (AlternativeTile.select && AlternativeTile.moveTo)
-        {
-            if (Checkifnear() == true)
-            {
-                Swap();
-                if (CheckMatch() == true)
-                {
-                    AlternativeTile.select = null;
-                    AlternativeTile.moveTo = null;
-                }
-                else
-                {
-                    Swap();
-                    AlternativeTile.select = null;
-                    AlternativeTile.moveTo = null;
-                }
-            }
-            else
-            {
-                AlternativeTile.select = null;
-                AlternativeTile.moveTo = null;
-            }
-        }
-        
-    }
+    
 
     public bool Checkifnear()
     {
         AlternativeTile sel = AlternativeTile.select.gameObject.GetComponent<AlternativeTile>();
         AlternativeTile mov = AlternativeTile.moveTo.gameObject.GetComponent<AlternativeTile>();
-        if (sel.x - 1 == mov.x && sel.y == mov.y)
-        {
-            //left
-            return true;
-        }
-        if (sel.x + 1 == mov.x && sel.y == mov.y)
-        {
-            //right
-            return true;
-        }
-        if (sel.x == mov.x && sel.y + 1 == mov.y)
-        {
-            //up
-            return true;
-        }
-        if (sel.x == mov.x && sel.y - 1 == mov.y)
-        {
-            //down
-            return true;
-        }
-        return false;
+        return (sel.x == mov.x && (int)Mathf.Abs(sel.y - mov.y) == 1)
+            || (sel.y == mov.y && (int)Mathf.Abs(sel.x - mov.x) == 1);
     }
 
     // Here continue
@@ -118,7 +72,8 @@ public class AltetrnativeGameBoard : MonoBehaviour
 
         board[sel.x, sel.y] = sel.ID;
         board[mov.x, mov.y] = mov.ID;
-
+        sel = null;
+        mov = null;
     }
 
 
@@ -158,6 +113,21 @@ public class AltetrnativeGameBoard : MonoBehaviour
             board[a.x, a.y] = a.ID;
             board[b.x, b.y] = b.ID;
         }
+    }
+
+    public AlternativeTile GetTileByGrid(int x, int y)
+    {
+        AlternativeTile[] allTile = FindObjectsOfType(typeof(AlternativeTile)) as AlternativeTile[];
+        AlternativeTile tile = gameObject.GetComponent<AlternativeTile>();
+
+        foreach (AlternativeTile a in allTile)
+        {
+            if (a.x == x && a.y == y)
+            {
+                return a;
+            }
+        }
+        return null;
     }
 
     void CreateBoard(int xOffset, int yOffset, int[] changingOffsetX, int[] changingOffsetY, bool changingGrid = false)
@@ -214,180 +184,53 @@ public class AltetrnativeGameBoard : MonoBehaviour
         gameObject.transform.position = new Vector3(-(objectPos.x / 2.0f), -(objectPos.y / 2.0f));
     }
 
-    public bool CheckMatch()
-    {
-        AlternativeTile[] allSel = FindObjectsOfType(typeof(AlternativeTile)) as AlternativeTile[];
-        AlternativeTile sel = AlternativeTile.select.gameObject.GetComponent<AlternativeTile>();
-
-        int countU = 0;
-        int countD = 0;
-        int countR = 0;
-        int countL = 0;
-
-        // left select & moveTo
-        for (int l = sel.x - 1; l >= 0; l--)
-        {
-            if (board[l, sel.y] == sel.ID)
-            {
-                countL++;
-            }
-            if (board[l, sel.y] != sel.ID)
-            {
-                break;
-            }
-        }
-
-        // right select & moveTo
-        for (int r = sel.x; r < board.GetLength(0); r++)
-        {
-            if (board[r, sel.y] == sel.ID)
-            {
-                countR++;
-            }
-            if (board[r, sel.y] != sel.ID)
-            {
-                break;
-            }
-        }
-        // down select & moveTo
-        for (int d = sel.y - 1; d >= 0; d--)
-        {
-            if (board[sel.x, d] == sel.ID)
-            {
-                countD++;
-            }
-            if (board[sel.x, d] != sel.ID)
-            {
-                break;
-            }
-        }
-        // up select & moveTo
-        for (int u = sel.y; u < board.GetLength(1); u++)
-        {
-            if (board[sel.x, u] == sel.ID)
-            {
-                countU++;
-            }
-            if (board[sel.x, u] != sel.ID)
-            {
-                break;
-            }
-        }
-        int indexerHorz = 0;
-        int indexerVert = 0;
-        // check row of three tile by horizontal and vertical.
-        if (countL + countR >= 3 || countD + countU >= 3)
-        {
-            if (countL + countR >= 3)
-            { // Destroy and Note empty blocks.
-                for (int cl = 0; cl <= countL; cl++)
-                {
-                    foreach (AlternativeTile a in allSel)
-                    {
-                        if (a.x == sel.x - cl && a.y == sel.y)
-                        {
-                            if (sel.ID == TargetTile)
-                                indexerHorz++;
-
-                            board[a.x, a.y] = 500; // note empty tile.
-                            goTiles.Remove(a.transform);
-                            Destroy(a.gameObject);
-                        }
-                    }
-                }
-                for (int cr = 0; cr < countR; cr++)
-                {
-                    foreach (AlternativeTile a in allSel)
-                    {
-                        if (a.x == sel.x + cr && a.y == sel.y)
-                        {
-                            if (sel.ID == TargetTile)
-                                indexerHorz++;
-
-                            board[a.x, a.y] = 500;
-                            goTiles.Remove(a.transform);
-                            Destroy(a.gameObject);
-                        }
-                    }
-                }
-            }
-            if (countD + countU >= 3)
-            {
-                for (int cd = 0; cd <= countD; cd++)
-                {
-                    foreach (AlternativeTile a in allSel)
-                    {
-                        if (a.x == sel.x && a.y == sel.y - cd)
-                        {
-                            if (sel.ID == TargetTile)
-                                indexerVert++;
-
-                            board[a.x, a.y] = 500;
-                            goTiles.Remove(a.transform);
-                            Destroy(a.gameObject);
-                        }
-                    }
-                }
-                for (int cu = 0; cu < countU; cu++)
-                {
-                    foreach (AlternativeTile a in allSel)
-                    {
-                        if (a.x == sel.x && a.y == sel.y + cu)
-                        {
-                            if (sel.ID == TargetTile)
-                                indexerVert++;
-
-                            board[a.x, a.y] = 500;
-                            goTiles.Remove(a.transform);
-                            Destroy(a.gameObject);
-                        }
-                    }
-                }
-            }
-            GUIManager.instance.TargeCounter -= indexerHorz | indexerVert;
-            indexerHorz = 0;
-            indexerVert = 0;
-
-            GUIManager.instance.Score += (countL + countR) | (countD + countU);
-            GUIManager.instance.MoveCounter--;
-            Respawn();
-            return true;
-        }
-        return false;
-    }
-
     public static bool In<T>(T x, params T[] values)
     {
         return ArrayUtility.Contains<T>(values, x);
     }
 
 
-    private void Respawn()
+    public void Respawn()
     {
         for (int x = 0; x < xSize; x++)
         {
             for (int y = 0; y < ySize; y++)
             {
-                if (y + 1 >= ySize) continue;
-
-
                 if (board[x, y] == 500) // spawn on destroyed cell
                 {
-                    //int randomNumberID = Random.Range(0, Tiles.Count); // Id
-                    //Transform obj = (Instantiate(Tiles[randomNumberID].transform, new Vector3(x, y), Quaternion.identity));
-
-                    //CenteredTile(obj, x, y);
-
-                    //obj.parent = transform;
-                    //AlternativeTile a = obj.gameObject.AddComponent<AlternativeTile>();
-                    //goTiles.Add(a.transform);
-                    //a.ID = randomNumberID;
-                    //a.x = x;
-                    //a.y = y;
-                    //board[x, y] = randomNumberID;
+                    StartCoroutine(ShiftTilesDown(x, y));
                 }
             }
         }
+    }
+
+    [SerializeField]
+    List<AlternativeTile> _ts = new List<AlternativeTile>();
+
+    private IEnumerator ShiftTilesDown(int x, int yStart, float shiftDelay = .03f)
+    {
+        IsShifting = true;
+        
+        int nullCount = 0;
+
+        for (int y = yStart; y < ySize; y++)
+        {
+            AlternativeTile _t = GetTileByGrid(x, y).gameObject.GetComponent<AlternativeTile>();
+            if (_t.x == 500)
+            {
+                nullCount++;
+            }
+            _ts.Add(_t);
+        }
+        for (int i = 0; i < nullCount; i++)
+        {
+            yield return new WaitForSeconds(shiftDelay);
+            for (int k = 0; k < _ts.Count - 1; k++)
+            { 
+            
+            }
+        }
+        IsShifting = false;
     }
 
     private void CenteredTile(Transform obj, int x, int y)
