@@ -5,8 +5,8 @@ using UnityEngine;
 public class AlternativeTile : MonoBehaviour
 {
     public int ID;
-    public int x;
-    public int y;
+    public int X;
+    public int Y;
     public GameObject selector;
     public Sprite curSpriteTile;
 
@@ -90,7 +90,6 @@ public class AlternativeTile : MonoBehaviour
     {
         AlternativeTile[] allTile = FindObjectsOfType(typeof(AlternativeTile)) as AlternativeTile[];
         AlternativeTile sel = select.gameObject.GetComponent<AlternativeTile>();
-        AlternativeTile mov = moveTo.gameObject.GetComponent<AlternativeTile>();
 
         int countU = 0;
         int countD = 0;
@@ -98,50 +97,50 @@ public class AlternativeTile : MonoBehaviour
         int countL = 0;
 
         // left select
-        for (int l = sel.x - 1; l >= 0; l--)
+        for (int l = sel.X - 1; l >= 0; l--)
         {
-            if (GB.board[l, sel.y] == sel.ID)
+            if (GB.board[l, sel.Y] == sel.ID)
             {
                 countL++;
             }
-            if (GB.board[l, sel.y] != sel.ID)
+            if (GB.board[l, sel.Y] != sel.ID)
             {
                 break;
             }
         }
 
         // right select
-        for (int r = sel.x; r < GB.board.GetLength(0); r++)
+        for (int r = sel.X; r < GB.board.GetLength(0); r++)
         {
-            if (GB.board[r, sel.y] == sel.ID)
+            if (GB.board[r, sel.Y] == sel.ID)
             {
                 countR++;
             }
-            if (GB.board[r, sel.y] != sel.ID)
+            if (GB.board[r, sel.Y] != sel.ID)
             {
                 break;
             }
         }
         // down select
-        for (int d = sel.y - 1; d >= 0; d--)
+        for (int d = sel.Y - 1; d >= 0; d--)
         {
-            if (GB.board[sel.x, d] == sel.ID)
+            if (GB.board[sel.X, d] == sel.ID)
             {
                 countD++;
             }
-            if (GB.board[sel.x, d] != sel.ID)
+            if (GB.board[sel.X, d] != sel.ID)
             {
                 break;
             }
         }
         // up select
-        for (int u = sel.y; u < GB.board.GetLength(1); u++)
+        for (int u = sel.Y; u < GB.board.GetLength(1); u++)
         {
-            if (GB.board[sel.x, u] == sel.ID)
+            if (GB.board[sel.X, u] == sel.ID)
             {
                 countU++;
             }
-            if (GB.board[sel.x, u] != sel.ID)
+            if (GB.board[sel.X, u] != sel.ID)
             {
                 break;
             }
@@ -158,12 +157,12 @@ public class AlternativeTile : MonoBehaviour
                 {
                     foreach (AlternativeTile a in allTile)
                     {
-                        if (a.x == sel.x - cl && a.y == sel.y)
+                        if (a.X == sel.X - cl && a.Y == sel.Y)
                         {
                             if (sel.ID == GB.TargetTile)
                                 indexerHorz++;
 
-                            GB.board[a.x, a.y] = 500; // note empty tile.
+                            GB.board[a.X, a.Y] = 500; // note empty tile.
                             GB.goTiles.Remove(a.transform);
                             Destroy(a.gameObject);
                         }
@@ -173,12 +172,12 @@ public class AlternativeTile : MonoBehaviour
                 {
                     foreach (AlternativeTile a in allTile)
                     {
-                        if (a.x == sel.x + cr && a.y == sel.y)
+                        if (a.X == sel.X + cr && a.Y == sel.Y)
                         {
                             if (sel.ID == GB.TargetTile)
                                 indexerHorz++;
 
-                            GB.board[a.x, a.y] = 500;
+                            GB.board[a.X, a.Y] = 500;
                             GB.goTiles.Remove(a.transform);
                             Destroy(a.gameObject);
                         }
@@ -191,12 +190,12 @@ public class AlternativeTile : MonoBehaviour
                 {
                     foreach (AlternativeTile a in allTile)
                     {
-                        if (a.x == sel.x && a.y == sel.y - cd)
+                        if (a.X == sel.X && a.Y == sel.Y - cd)
                         {
                             if (sel.ID == GB.TargetTile)
                                 indexerVert++;
 
-                            GB.board[a.x, a.y] = 500;
+                            GB.board[a.X, a.Y] = 500;
                             GB.goTiles.Remove(a.transform);
                             Destroy(a.gameObject);
                         }
@@ -206,12 +205,12 @@ public class AlternativeTile : MonoBehaviour
                 {
                     foreach (AlternativeTile a in allTile)
                     {
-                        if (a.x == sel.x && a.y == sel.y + cu)
+                        if (a.X == sel.X && a.Y == sel.Y + cu)
                         {
                             if (sel.ID == GB.TargetTile)
                                 indexerVert++;
 
-                            GB.board[a.x, a.y] = 500;
+                            GB.board[a.X, a.Y] = 500;
                             GB.goTiles.Remove(a.transform);
                             Destroy(a.gameObject);
                         }
@@ -247,15 +246,15 @@ public class AlternativeTile : MonoBehaviour
             if (GB.Checkifnear() == true)
             {
                 GB.Swap();
-                if (CheckMatch() == true)
-                {
-                    select = null;
-                    moveTo = null;
-                }
-                else
-                {
-                    GB.Swap();
-                }
+                //if (CheckMatch() == true)
+                //{
+                //    select = null;
+                //    moveTo = null;
+                //}
+                //else
+                //{
+                //    GB.Swap();
+                //}
             }
             else
             {
