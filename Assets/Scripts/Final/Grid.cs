@@ -45,6 +45,7 @@ public class Grid : MonoBehaviour
     public float gridOffsetXPosition;
     public float gridOffsetYPosition;
 
+
     public float fillTime; // время заполнения
 
     public Level level;
@@ -106,13 +107,6 @@ public class Grid : MonoBehaviour
                 }
                 GameObject obj = Instantiate(backgroundPrefab, GetWorldPosition(x, y), Quaternion.identity);
                 obj.transform.parent = transform;
-            }
-        }
-
-        for (int x = 0; x < xSize; x++)
-        {
-            for (int y = 0; y < ySize; y++)
-            {
                 if (tiles[x, y] == null)
                 {
                     SpawnNewTile(x, y, TileType.EMPTY);
