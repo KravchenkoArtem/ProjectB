@@ -63,9 +63,10 @@ public class Grid : MonoBehaviour
     public Tile selectedTile;
     public Tile movedTile;
 
-    public bool gameOver = false;
+    [HideInInspector]
+    public bool GameOver = false;
 
-    public bool isFilling = false;
+    public bool IsFilling = false;
 
     [SerializeField]
     List<Tile> goTile = new List<Tile>();
@@ -119,7 +120,7 @@ public class Grid : MonoBehaviour
     public IEnumerator Fill()
     {
         bool needsRefill = true;
-        isFilling = true;
+        IsFilling = true;
         while (needsRefill)
         {
             yield return new WaitForSeconds(fillTime);
@@ -131,7 +132,7 @@ public class Grid : MonoBehaviour
             }
             needsRefill = ClearAllValidMatches();
         }
-        isFilling = false;
+        IsFilling = false;
     }
 
     public bool FillStep()
@@ -580,7 +581,7 @@ public class Grid : MonoBehaviour
 
     public void SwapTile(Tile sel, Tile mov)
     {
-        if (gameOver)
+        if (GameOver)
             return;
 
         if (sel.IsMovable && mov.IsMovable)
@@ -602,6 +603,8 @@ public class Grid : MonoBehaviour
                 movedTile = null;
 
                 StartCoroutine(Fill());
+
+                level.OnMove();
             }
             else
             {
@@ -620,7 +623,7 @@ public class Grid : MonoBehaviour
     private IEnumerator ShuffleTile()
     {
         bool isShuffle = false;
-        if (!isFilling && !isShuffle)
+        if (!IsFilling && !isShuffle)
         {
             isShuffle = true;
             for (int i = 0; i < goTile.Count; i++)
@@ -663,14 +666,6 @@ public class Grid : MonoBehaviour
         tiles[x, y] = newTile.GetComponent<Tile>();
         tiles[x, y].Init(x, y, this, type);
         return tiles[x, y];
-    }
-
-    public void CenteredTile(Transform obj, Vector2 vec)
-    {
-        Vector3 localScale = obj.localScale;
-        Vector3 objectPos = new Vector3(vec.x * (localScale.x), vec.y * (localScale.y));
-        obj.transform.parent = gameObject.transform;
-        obj.transform.localPosition = objectPos;
     }
 
     public Vector2 GetWorldPosition(int x, int y)

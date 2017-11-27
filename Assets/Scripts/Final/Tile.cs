@@ -114,6 +114,8 @@ public class Tile : MonoBehaviour
         if (!IsClearable)
             return;
 
+        grid.level.OnTileCleared(this);
+
         isBeginCleared = true;
         StartCoroutine(ClearCoroutine());
     }
@@ -142,7 +144,7 @@ public class Tile : MonoBehaviour
 
     public void OnMouseOver()
     {
-        if (grid.isFilling)
+        if (grid.IsFilling)
             return;
 
         if (Input.GetMouseButtonDown(0))
