@@ -14,7 +14,6 @@ public class Grid : MonoBehaviour
         ICE,
         ROW_CLEAR,
         COLUMN_CLEAR,
-        COUNT,
         GRIDSPACE
     };
 
@@ -41,6 +40,13 @@ public class Grid : MonoBehaviour
     private int[] changingGridY = new int[] { 0, 6 };
     [SerializeField]
     private bool changingGrid = false;
+
+    [SerializeField]
+    private int[] addObstacleGridX;
+    [SerializeField]
+    private int[] addObstacleGridY;
+    [SerializeField]
+    private bool obstacleGrid = false;
 
     public float gridOffsetXPosition;
     public float gridOffsetYPosition;
@@ -95,6 +101,17 @@ public class Grid : MonoBehaviour
         {
             for (int y = 0; y < ySize; y++)
             {
+                if (obstacleGrid)
+                {
+                    if (In(x, addObstacleGridY))
+                    {
+                        if (In(y, addObstacleGridX))
+                        {
+                            SpawnNewTile(x, y, TileType.ICE);
+                        }
+                    }
+                }
+
                 if (changingGrid)
                 {
                     if (In(x, changingOffsetY))
@@ -499,10 +516,15 @@ public class Grid : MonoBehaviour
         {
             if (NearX != x && NearX >= 0 && NearX < xSize)
             {
-                if (tiles[NearX, y].Type == TileType.ICE && tiles[NearX, y].IsCake)
+                if (tiles[NearX, y].Type == TileType.ICE && tiles[NearX, y].IsClearable)
                 {
-                    tiles[NearX, y].Clear();
-                    SpawnNewTile(NearX, y, TileType.EMPTY);
+                    tiles[NearX, y].obstacleDurability -= 1;
+                    tiles[NearX, y].GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
+                    if (tiles[NearX, y].obstacleDurability <= 0)
+                    {
+                        tiles[NearX, y].Clear();
+                        SpawnNewTile(NearX, y, TileType.EMPTY);
+                    }
                 }
             }
         }
@@ -513,8 +535,14 @@ public class Grid : MonoBehaviour
             {
                 if (tiles[x, NearY].Type == TileType.ICE && tiles[x, NearY].IsClearable)
                 {
-                    tiles[x, NearY].Clear();
-                    SpawnNewTile(x, NearY, TileType.EMPTY);
+
+                    tiles[x, NearY].obstacleDurability -= 1;
+                    tiles[x, NearY].GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
+                    if (tiles[x, NearY].obstacleDurability <= 0)
+                    {
+                        tiles[x, NearY].Clear();
+                        SpawnNewTile(x, NearY, TileType.EMPTY);
+                    }
                 }
             }
         }
@@ -542,8 +570,7 @@ public class Grid : MonoBehaviour
         {
             for (int y = 0; y < ySize; y++)
             {
-                if (tiles[x, y].IsCake && (tiles[x, y].Cake == cake
-                    || cake == Tile.CakeType.ANY))
+                if (tiles[x, y].IsCake && (tiles[x, y].Cake == cake))
                 {
                     ClearTile(x, y);
                 }
@@ -604,7 +631,10 @@ public class Grid : MonoBehaviour
 
                 StartCoroutine(Fill());
 
-                level.OnMove();
+                if (level.Type != Level.LevelType.TIMER)
+                {
+                    level.OnMove();
+                }
             }
             else
             {
@@ -618,7 +648,6 @@ public class Grid : MonoBehaviour
     {
         StartCoroutine(ShuffleTile());
     }
-
 
     private IEnumerator ShuffleTile()
     {
@@ -651,6 +680,8 @@ public class Grid : MonoBehaviour
             selectedTile = null;
             movedTile = null;
 
+            level.OnMove();
+
             StartCoroutine(Fill());
             yield return new WaitForSeconds(fillTime);
             isShuffle = false;
@@ -678,4 +709,39 @@ public class Grid : MonoBehaviour
     {
         return ArrayUtility.Contains<T>(values, x);
     }
+
+    public List<Tile> GetTilesOfType(TileType type)
+    {
+        List<Tile> tilesOfType = new List<Tile>();
+
+        for (int x = 0; x < xSize; x++)
+        {
+            for (int y = 0; y < ySize; y++)
+            {
+                if (tiles[x, y].Type == type)
+                {
+                    tilesOfType.Add(tiles[x, y]);
+                }
+            }
+        }
+        return tilesOfType;
+    }
+
+    public List<Tile> GetCakesOfType(Tile.CakeType cake)
+    {
+        List<Tile> TilesOfCake = new List<Tile>();
+
+        for (int x = 0; x < xSize; x++)
+        {
+            for (int y = 0; y < ySize; y++)
+            {
+                if (tiles[x,y].Cake == cake)
+                {
+                    TilesOfCake.Add(tiles[x, y]);
+                }
+            }
+        }
+        return TilesOfCake;
+    }
 }
+

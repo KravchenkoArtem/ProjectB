@@ -33,6 +33,8 @@ public class GameOver : MonoBehaviour
         GameOverTitle.color = Color.red;
         playButton.gameObject.SetActive(false);
 
+        BestScoreText.text = PlayerPrefs.GetInt(SceneManager.GetActiveScene().name, score).ToString();
+
         ScoreText.text = score.ToString();
     }
 
@@ -45,6 +47,14 @@ public class GameOver : MonoBehaviour
         playButton.gameObject.SetActive(true);
 
         ScoreText.text = score.ToString();
+        if (score > PlayerPrefs.GetInt(SceneManager.GetActiveScene().name, score))
+        {
+            PlayerPrefs.SetInt(SceneManager.GetActiveScene().name, score);
+        }
+
+        BestScoreText.text = PlayerPrefs.GetInt(SceneManager.GetActiveScene().name, score).ToString();
+
+        BestScoreText.enabled = false;
         ScoreText.enabled = false;
 
         StartCoroutine(ShowWinCoroutine(starCount));
@@ -63,6 +73,7 @@ public class GameOver : MonoBehaviour
             }
         }
         ScoreText.enabled = true;
+        BestScoreText.enabled = true;
     }
 
     public void ClickReplay()

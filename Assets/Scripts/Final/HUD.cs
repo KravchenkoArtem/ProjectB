@@ -16,29 +16,19 @@ public class HUD : MonoBehaviour
     [SerializeField]
     private Text targetText;
     [SerializeField]
-    private Text targetSubText;
+    private Text numText;
     [SerializeField]
     private Text scoreText;
     [SerializeField]
     private Image[] stars;
+    [SerializeField]
+    private GameObject targetCake;
+
+    [SerializeField]
+    private Sprite[] srCakes;
 
     [SerializeField]
     private int starIndex = 0;
-
-    private void Start()
-    {
-        for (int i = 1; i < stars.Length; i++)
-        {
-            if (i == starIndex)
-            {
-                stars[i].enabled = true;
-            }
-            else
-            {
-                stars[i].enabled = false;
-            }
-        }
-    }
 
     public void SetScore(int score)
     {
@@ -61,9 +51,38 @@ public class HUD : MonoBehaviour
         }
     }
 
+    public void SetTargetCake(Tile.CakeType cakeSprite)
+    {
+        targetCake.gameObject.SetActive(true);
+        switch (cakeSprite)
+        {
+            case Tile.CakeType.BLACKCAKE:
+                targetCake.GetComponent<Image>().sprite = srCakes[0];
+                break;
+            case Tile.CakeType.BIGCAKE:
+                targetCake.GetComponent<Image>().sprite = srCakes[1];
+                break;
+            case Tile.CakeType.CROISSANTCAKE:
+                targetCake.GetComponent<Image>().sprite = srCakes[2];
+                break;
+            case Tile.CakeType.PINKCAKE:
+                targetCake.GetComponent<Image>().sprite = srCakes[3];
+                break;
+            case Tile.CakeType.REDCAKE:
+                targetCake.GetComponent<Image>().sprite = srCakes[4];
+                break;
+            case Tile.CakeType.WHITECAKE:
+                targetCake.GetComponent<Image>().sprite = srCakes[5];
+                break;
+            case Tile.CakeType.YELLOWCAKE:
+                targetCake.GetComponent<Image>().sprite = srCakes[6];
+                break;
+        }
+    }
+
     public void SetTarget(int target)
     {
-        targetText.text = target.ToString();
+        numText.text = target.ToString();
     }
 
     public void SetRemaining(string remaining)
@@ -78,23 +97,23 @@ public class HUD : MonoBehaviour
 
     public void SetLevelType(Level.LevelType type)
     {
-        switch(type)
+        switch (type)
         {
             case Level.LevelType.MOVES:
                 remainingSubText.text = "Moves Left";
-                targetSubText.text = "Target Score";
+                targetText.text =  string.Format("Target Score:");
                 break;
             case Level.LevelType.OBSTACLE:
                 remainingSubText.text = "Moves Left";
-                targetSubText.text = "Ice Remaining";
+                targetText.text = string.Format("Ice Left:");
                 break;
             case Level.LevelType.TARGETCAKE:
                 remainingSubText.text = "Moves Left";
-                targetSubText.text = "Cakes Remaining";
+                targetText.text = string.Format("Cakes Left:");
                 break;
             case Level.LevelType.TIMER:
                 remainingSubText.text = "Time Left";
-                targetSubText.text = "Target Score";
+                targetText.text = string.Format("Target Score:");
                 break;
         }
     }
@@ -102,10 +121,6 @@ public class HUD : MonoBehaviour
     public void OnGameWin(int score)
     {
         gameOver.ShowWin(score, starIndex);
-        if (starIndex > PlayerPrefs.GetInt(SceneManager.GetActiveScene().name, 0)) // starIndex
-        {
-            PlayerPrefs.SetInt(SceneManager.GetActiveScene().name, starIndex);
-        }
     }
 
     public void OnGameLose(int score)

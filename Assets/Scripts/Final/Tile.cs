@@ -6,7 +6,7 @@ public class Tile : MonoBehaviour
 {
     public enum CakeType
     {
-        BLACKCAKE, CROISSANTCAKE, PINKCAKE, REDCAKE, WHITECAKE, BIGCAKE, YELLOWCAKE, ANY, COUNT
+        BLACKCAKE, CROISSANTCAKE, PINKCAKE, REDCAKE, WHITECAKE, BIGCAKE, YELLOWCAKE
     };
 
     public int score;
@@ -52,8 +52,11 @@ public class Tile : MonoBehaviour
     }
 
     private SpriteRenderer sprite;
+
     private Dictionary<CakeType, Sprite> cakeSpriteDict;
 
+    [HideInInspector]
+    public int obstacleDurability = 2;
 
     private void Awake()
     {
