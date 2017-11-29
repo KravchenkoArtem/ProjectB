@@ -8,9 +8,10 @@ public class LevelTarget : Level
     public Tile.CakeType cakeType;
 
     private int movesUsed = 0;
-    private int numTargetLeft = 10;
     [SerializeField]
-    public int NumTargetLeft { get { return numTargetLeft; } set { numTargetLeft = Mathf.Clamp(value, 0, numTargetLeft); } }
+    private int TargetCakesLeft = 10;
+    [SerializeField]
+    public int NumTargetLeft { get { return TargetCakesLeft; } set { TargetCakesLeft = Mathf.Clamp(value, 0, TargetCakesLeft); } }
 
     private void Start()
     {

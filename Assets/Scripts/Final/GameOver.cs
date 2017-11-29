@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -15,8 +14,16 @@ public class GameOver : MonoBehaviour
     public Image GameOverTitle;
     public Button playButton;
 
+    SceneController sceneController;
+
     private void Start()
     {
+        sceneController = SceneController.Instance;
+        if (sceneController == null)
+        {
+            Debug.LogError("SceneController not found!");
+        }
+
         GameOverPanel.SetActive(false);
 
         for (int i = 0; i < Stars.Length; i++)
@@ -74,6 +81,11 @@ public class GameOver : MonoBehaviour
         }
         ScoreText.enabled = true;
         BestScoreText.enabled = true;
+    }
+
+    public void GoToMainMenu()
+    {
+        sceneController.GoToMainMenu();
     }
 
     public void ClickReplay()

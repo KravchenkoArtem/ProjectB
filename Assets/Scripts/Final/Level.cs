@@ -12,8 +12,8 @@ public class Level : MonoBehaviour
         TARGETCAKE
     };
 
-    public Grid grid;
-    public HUD hud;
+    protected Grid grid;
+    protected HUD hud;
 
     public int score1Star;
     public int score2Star;
@@ -27,6 +27,12 @@ public class Level : MonoBehaviour
 
     protected int currentScore;
     protected bool didWin;
+
+    private void Awake()
+    {
+        grid = GameObject.FindGameObjectWithTag("Grid").GetComponent<Grid>();
+        hud = GameObject.FindGameObjectWithTag("HUD").GetComponent<HUD>();
+    }
 
     private void Start()
     {

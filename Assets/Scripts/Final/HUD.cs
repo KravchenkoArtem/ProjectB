@@ -6,9 +6,8 @@ using UnityEngine.SceneManagement;
 
 public class HUD : MonoBehaviour
 {
-    [SerializeField]
-    GameOver gameOver;
-    public Level level;
+    private GameOver gameOver;
+    private Level level;
     [SerializeField]
     private Text remainingText;
     [SerializeField]
@@ -23,12 +22,18 @@ public class HUD : MonoBehaviour
     private Image[] stars;
     [SerializeField]
     private GameObject targetCake;
-
+  
     [SerializeField]
     private Sprite[] srCakes;
 
     [SerializeField]
     private int starIndex = 0;
+
+    private void Awake()
+    {
+        gameOver = GameObject.FindGameObjectWithTag("GO").GetComponent<GameOver>();
+        level = GameObject.FindGameObjectWithTag("GM").GetComponent<Level>();
+    }
 
     public void SetScore(int score)
     {

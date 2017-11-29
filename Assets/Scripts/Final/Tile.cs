@@ -22,7 +22,7 @@ public class Tile : MonoBehaviour
     [SerializeField]
     private AnimationClip clearAnimation;
     [SerializeField]
-    private GameObject Selector;
+    private GameObject selector;
 
     public bool IsMovable = false;
     private IEnumerator moveCoroutine;
@@ -55,7 +55,6 @@ public class Tile : MonoBehaviour
 
     private Dictionary<CakeType, Sprite> cakeSpriteDict;
 
-    [HideInInspector]
     public int obstacleDurability = 2;
 
     private void Awake()
@@ -86,7 +85,7 @@ public class Tile : MonoBehaviour
     }
 
     public void Move(int newX, int newY, float time)
-    {
+    {        
         if (!IsMovable)
             return;
 
@@ -117,7 +116,7 @@ public class Tile : MonoBehaviour
         if (!IsClearable)
             return;
 
-        grid.level.OnTileCleared(this);
+        grid.Level.OnTileCleared(this);
 
         isBeginCleared = true;
         StartCoroutine(ClearCoroutine());
@@ -147,17 +146,17 @@ public class Tile : MonoBehaviour
 
     public void OnMouseOver()
     {
-        if (grid.IsFilling)
+        if (grid.IsFilling || !IsCake)
             return;
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (!grid.selectedTile)
+            if (!grid.SelectedTile)
             {
                 grid.SelectTile(this);
                 Select();
             }
-            else if (grid.selectedTile != transform && !grid.movedTile)
+            else if (grid.SelectedTile != transform && !grid.movedTile)
             {
                 grid.MoveTile(this);
                 grid.MovedTile();
@@ -168,13 +167,13 @@ public class Tile : MonoBehaviour
 
     public void Select()
     {
-        Selector.SetActive(true);
+        selector.SetActive(true);
     }
 
     public void Deselect()
     {
-        Selector.SetActive(false);
-        grid.selectedTile = null;
+        selector.SetActive(false);
+        grid.SelectedTile = null;
         grid.movedTile = null;
     }
 }

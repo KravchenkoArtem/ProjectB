@@ -12,8 +12,7 @@ public class Grid : MonoBehaviour
         EMPTY,
         NORMAL,
         ICE,
-        ROW_CLEAR,
-        COLUMN_CLEAR,
+        BOOMB,
         GRIDSPACE
     };
 
@@ -32,8 +31,8 @@ public class Grid : MonoBehaviour
         public int y;
     };
 
-    public int xSize;
-    public int ySize;
+    public int Xsize;
+    public int Ysize;
     [SerializeField]
     private int[] changingGridX = new int[] { 2, 3, 4, 5 };
     [SerializeField]
@@ -48,13 +47,14 @@ public class Grid : MonoBehaviour
     [SerializeField]
     private bool obstacleGrid = false;
 
-    public float gridOffsetXPosition;
-    public float gridOffsetYPosition;
+    public float GridOffsetXPosition;
+    public float GridOffsetYPosition;
 
 
-    public float fillTime; // время заполнения
+    public float FillTime; // время заполнения
 
-    public Level level;
+    [HideInInspector]
+    public Level Level;
 
     public TilePrefab[] tilePrefabs;
     public GameObject backgroundPrefab;
@@ -66,7 +66,7 @@ public class Grid : MonoBehaviour
 
     private bool inverse = false;
 
-    public Tile selectedTile;
+    public Tile SelectedTile;
     public Tile movedTile;
 
     [HideInInspector]
@@ -74,11 +74,14 @@ public class Grid : MonoBehaviour
 
     public bool IsFilling = false;
 
+    public bool IsPause = false;
+
     [SerializeField]
     List<Tile> goTile = new List<Tile>();
 
     private void Awake()
     {
+        Level = GameObject.FindGameObjectWithTag("GM").GetComponent<Level>();
         instance = GetComponent<Grid>();
         CreateGrid(changingGridX, changingGridY, changingGrid);
     }
@@ -95,11 +98,11 @@ public class Grid : MonoBehaviour
             }
         }
 
-        tiles = new Tile[xSize, ySize];
+        tiles = new Tile[Xsize, Ysize];
 
-        for (int x = 0; x < xSize; x++)
+        for (int x = 0; x < Xsize; x++)
         {
-            for (int y = 0; y < ySize; y++)
+            for (int y = 0; y < Ysize; y++)
             {
                 if (obstacleGrid)
                 {
@@ -136,16 +139,21 @@ public class Grid : MonoBehaviour
 
     public IEnumerator Fill()
     {
+        while (IsPause)
+        {
+            yield return null;
+        }
+
         bool needsRefill = true;
         IsFilling = true;
         while (needsRefill)
         {
-            yield return new WaitForSeconds(fillTime);
+            yield return new WaitForSeconds(FillTime);
 
             while (FillStep())
             {
                 inverse = !inverse;
-                yield return new WaitForSeconds(fillTime);
+                yield return new WaitForSeconds(FillTime);
             }
             needsRefill = ClearAllValidMatches();
         }
@@ -156,14 +164,14 @@ public class Grid : MonoBehaviour
     {
         bool movedTile = false;
 
-        for (int y = ySize - 2; y >= 0; y--)
+        for (int y = Ysize - 2; y >= 0; y--)
         {
-            for (int loopX = 0; loopX < xSize; loopX++)
+            for (int loopX = 0; loopX < Xsize; loopX++)
             {
                 int x = loopX;
                 if (inverse)
                 {
-                    x = xSize - 1 - loopX;
+                    x = Xsize - 1 - loopX;
                 }
                 Tile tile = tiles[x, y];
                 if (tile.IsMovable)
@@ -172,7 +180,7 @@ public class Grid : MonoBehaviour
                     if (tileBelow.Type == TileType.EMPTY)
                     {
                         Destroy(tileBelow.gameObject);
-                        tile.Move(x, y + 1, fillTime);
+                        tile.Move(x, y + 1, FillTime);
                         tiles[x, y + 1] = tile;
                         SpawnNewTile(x, y, TileType.EMPTY);
                         movedTile = true;
@@ -190,7 +198,7 @@ public class Grid : MonoBehaviour
                                     diagX = x - diag;
                                 }
 
-                                if (diagX >= 0 && diagX < xSize)
+                                if (diagX >= 0 && diagX < Xsize)
                                 {
                                     Tile diagonalTile = tiles[diagX, y + 1];
 
@@ -216,7 +224,7 @@ public class Grid : MonoBehaviour
                                         if (!hasTileAbove)
                                         {
                                             Destroy(diagonalTile.gameObject);
-                                            tile.Move(diagX, y + 1, fillTime);
+                                            tile.Move(diagX, y + 1, FillTime);
                                             tiles[diagX, y + 1] = tile;
                                             SpawnNewTile(x, y, TileType.EMPTY);
                                             movedTile = true;
@@ -230,27 +238,38 @@ public class Grid : MonoBehaviour
                 }
             }
         }
-        for (int x = 0; x < xSize; x++)
+        for (int x = 0; x < Xsize; x++)
         {
             Tile tileBelow = tiles[x, 0];
             if (tileBelow.Type == TileType.EMPTY)
             {
-                // Randomize TileType
-                // TileType[] types = { TileType.NORMAL, TileType.ICE };
-                // System.Random random = new System.Random();
-                // TileType randomTypes = types[random.Next(types.Length)];
-
                 Destroy(tileBelow.gameObject);
-                GameObject newTile = Instantiate(tilePrefabDict[TileType.NORMAL], GetWorldPosition(x, -1), Quaternion.identity);
-                newTile.transform.parent = transform;
 
-                goTile.Add(newTile.GetComponent<Tile>());
+                if (Random.Range(0, 65) == 1)
+                {
+                    GameObject boombTile = Instantiate(tilePrefabDict[TileType.BOOMB], GetWorldPosition(x, -1), Quaternion.identity);
+                    boombTile.transform.parent = transform;
 
-                tiles[x, 0] = newTile.GetComponent<Tile>();
-                tiles[x, 0].Init(x, -1, this, TileType.NORMAL);
-                tiles[x, 0].Move(x, 0, fillTime);
-                tiles[x, 0].SetCake((Tile.CakeType)Random.Range(0, tiles[x, 0].NumCakes));
-                movedTile = true;
+                    goTile.Add(boombTile.GetComponent<Tile>());
+
+                    tiles[x, 0] = boombTile.GetComponent<Tile>();
+                    tiles[x, 0].Init(x, -1, this, TileType.BOOMB);
+                    tiles[x, 0].Move(x, 0, FillTime);
+                    movedTile = true;
+                }
+                else
+                {
+                    GameObject newTile = Instantiate(tilePrefabDict[TileType.NORMAL], GetWorldPosition(x, -1), Quaternion.identity);
+                    newTile.transform.parent = transform;
+
+                    goTile.Add(newTile.GetComponent<Tile>());
+
+                    tiles[x, 0] = newTile.GetComponent<Tile>();
+                    tiles[x, 0].Init(x, -1, this, TileType.NORMAL);
+                    tiles[x, 0].Move(x, 0, FillTime);
+                    tiles[x, 0].SetCake((Tile.CakeType)Random.Range(0, tiles[x, 0].NumCakes));
+                    movedTile = true;
+                }
             }
         }
         return movedTile;
@@ -269,7 +288,7 @@ public class Grid : MonoBehaviour
 
             for (int dir = 0; dir <= 1; dir++)
             {
-                for (int xOffset = 1; xOffset < xSize; xOffset++)
+                for (int xOffset = 1; xOffset < Xsize; xOffset++)
                 {
                     int x;
 
@@ -282,7 +301,7 @@ public class Grid : MonoBehaviour
                         x = newX + xOffset;
                     }
 
-                    if (x < 0 || x >= xSize)
+                    if (x < 0 || x >= Xsize)
                     {
                         break;
                     }
@@ -312,7 +331,7 @@ public class Grid : MonoBehaviour
                 {
                     for (int dir = 0; dir <= 1; dir++)
                     {
-                        for (int yOffset = 1; yOffset < ySize; yOffset++)
+                        for (int yOffset = 1; yOffset < Ysize; yOffset++)
                         {
                             int y;
 
@@ -325,7 +344,7 @@ public class Grid : MonoBehaviour
                                 y = newY + yOffset;
                             }
 
-                            if (y < 0 || y >= ySize)
+                            if (y < 0 || y >= Ysize)
                             {
                                 break;
                             }
@@ -368,7 +387,7 @@ public class Grid : MonoBehaviour
 
             for (int dir = 0; dir <= 1; dir++)
             {
-                for (int yOffset = 1; yOffset < ySize; yOffset++)
+                for (int yOffset = 1; yOffset < Ysize; yOffset++)
                 {
                     int y;
 
@@ -381,7 +400,7 @@ public class Grid : MonoBehaviour
                         y = newY + yOffset;
                     }
 
-                    if (y < 0 || y >= ySize)
+                    if (y < 0 || y >= Ysize)
                     {
                         break;
                     }
@@ -411,7 +430,7 @@ public class Grid : MonoBehaviour
                 {
                     for (int dir = 0; dir <= 1; dir++)
                     {
-                        for (int xOffset = 1; xOffset < xSize; xOffset++)
+                        for (int xOffset = 1; xOffset < Xsize; xOffset++)
                         {
                             int x;
 
@@ -424,7 +443,7 @@ public class Grid : MonoBehaviour
                                 x = newX + xOffset;
                             }
 
-                            if (x < 0 || x >= xSize)
+                            if (x < 0 || x >= Xsize)
                             {
                                 break;
                             }
@@ -468,9 +487,9 @@ public class Grid : MonoBehaviour
     {
         bool needsRefill = false;
 
-        for (int y = 0; y < ySize; y++)
+        for (int y = 0; y < Ysize; y++)
         {
-            for (int x = 0; x < xSize; x++)
+            for (int x = 0; x < Xsize; x++)
             {
                 if (tiles[x, y].IsClearable)
                 {
@@ -478,7 +497,10 @@ public class Grid : MonoBehaviour
 
                     if (match != null)
                     {
-                        Tile randomPiece = match[Random.Range(0, match.Count)];
+                        if (match.Count >= 4)
+                        {
+                            ClearCake(match[0].Cake);
+                        }
 
                         for (int i = 0; i < match.Count; i++)
                         {
@@ -514,14 +536,19 @@ public class Grid : MonoBehaviour
     {
         for (int NearX = x - 1; NearX <= x + 1; NearX++)
         {
-            if (NearX != x && NearX >= 0 && NearX < xSize)
+            if (NearX != x && NearX >= 0 && NearX < Xsize)
             {
-                if (tiles[NearX, y].Type == TileType.ICE && tiles[NearX, y].IsClearable)
+                if ((tiles[NearX, y].Type == TileType.ICE || tiles[NearX, y].Type == TileType.BOOMB) && tiles[NearX, y].IsClearable)
                 {
                     tiles[NearX, y].obstacleDurability -= 1;
                     tiles[NearX, y].GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
                     if (tiles[NearX, y].obstacleDurability <= 0)
                     {
+                        if (tiles[NearX, y].Type == TileType.BOOMB)
+                        {
+                            ClearRow(NearX);
+                        }
+                        goTile.Remove(tiles[NearX, y]);
                         tiles[NearX, y].Clear();
                         SpawnNewTile(NearX, y, TileType.EMPTY);
                     }
@@ -531,15 +558,20 @@ public class Grid : MonoBehaviour
 
         for (int NearY = y - 1; NearY <= y + 1; NearY++)
         {
-            if (NearY != y && NearY >= 0 && NearY < ySize)
+            if (NearY != y && NearY >= 0 && NearY < Ysize)
             {
-                if (tiles[x, NearY].Type == TileType.ICE && tiles[x, NearY].IsClearable)
+                if ((tiles[x, NearY].Type == TileType.ICE || tiles[x, NearY].Type == TileType.BOOMB) && tiles[x, NearY].IsClearable)
                 {
 
                     tiles[x, NearY].obstacleDurability -= 1;
                     tiles[x, NearY].GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
                     if (tiles[x, NearY].obstacleDurability <= 0)
                     {
+                        if (tiles[x, NearY].Type == TileType.BOOMB)
+                        {
+                            ClearColumn(NearY);
+                        }
+                        goTile.Remove(tiles[x, NearY]);
                         tiles[x, NearY].Clear();
                         SpawnNewTile(x, NearY, TileType.EMPTY);
                     }
@@ -550,7 +582,7 @@ public class Grid : MonoBehaviour
 
     public void ClearRow(int row)
     {
-        for (int x = 0; x < xSize; x++)
+        for (int x = 0; x < Xsize; x++)
         {
             ClearTile(x, row);
         }
@@ -558,7 +590,7 @@ public class Grid : MonoBehaviour
 
     public void ClearColumn(int column)
     {
-        for (int y = 0; y < ySize; y++)
+        for (int y = 0; y < Ysize; y++)
         {
             ClearTile(column, y);
         }
@@ -566,9 +598,9 @@ public class Grid : MonoBehaviour
 
     public void ClearCake(Tile.CakeType cake)
     {
-        for (int x = 0; x < xSize; x++)
+        for (int x = 0; x < Xsize; x++)
         {
-            for (int y = 0; y < ySize; y++)
+            for (int y = 0; y < Ysize; y++)
             {
                 if (tiles[x, y].IsCake && (tiles[x, y].Cake == cake))
                 {
@@ -580,7 +612,7 @@ public class Grid : MonoBehaviour
 
     public void SelectTile(Tile tile)
     {
-        selectedTile = tile;
+        SelectedTile = tile;
     }
 
     public void MoveTile(Tile tile)
@@ -590,13 +622,13 @@ public class Grid : MonoBehaviour
 
     public void MovedTile()
     {
-        if (IsNear(selectedTile, movedTile) && (GetMatch(selectedTile, movedTile.X, movedTile.Y) != null || GetMatch(movedTile, selectedTile.X, selectedTile.Y) != null))
+        if (IsNear(SelectedTile, movedTile) && (GetMatch(SelectedTile, movedTile.X, movedTile.Y) != null || GetMatch(movedTile, SelectedTile.X, SelectedTile.Y) != null))
         {
-            SwapTile(selectedTile, movedTile);
+            SwapTile(SelectedTile, movedTile);
         }
         else
         {
-            selectedTile.Deselect();
+            SelectedTile.Deselect();
         }
     }
 
@@ -621,19 +653,19 @@ public class Grid : MonoBehaviour
                 int selX = sel.X;
                 int selY = sel.Y;
 
-                sel.Move(mov.X, mov.Y, fillTime);
-                mov.Move(selX, selY, fillTime);
+                sel.Move(mov.X, mov.Y, FillTime);
+                mov.Move(selX, selY, FillTime);
 
                 ClearAllValidMatches();
 
-                selectedTile = null;
+                SelectedTile = null;
                 movedTile = null;
 
                 StartCoroutine(Fill());
 
-                if (level.Type != Level.LevelType.TIMER)
+                if (Level.Type != Level.LevelType.TIMER)
                 {
-                    level.OnMove();
+                    Level.OnMove();
                 }
             }
             else
@@ -666,8 +698,8 @@ public class Grid : MonoBehaviour
                 int tempY = a.Y;
                 TileType tempType = a.Type;
 
-                a.Move(b.X, b.Y, fillTime);
-                b.Move(tempX, tempY, fillTime);
+                a.Move(b.X, b.Y, FillTime);
+                b.Move(tempX, tempY, FillTime);
 
                 a.Init(a.X, a.Y, this, a.Type);
                 b.Init(tempX, tempY, this, tempType);
@@ -677,13 +709,13 @@ public class Grid : MonoBehaviour
             }
             ClearAllValidMatches();
 
-            selectedTile = null;
+            SelectedTile = null;
             movedTile = null;
 
-            level.OnMove();
+            Level.OnMove();
 
             StartCoroutine(Fill());
-            yield return new WaitForSeconds(fillTime);
+            yield return new WaitForSeconds(FillTime);
             isShuffle = false;
         }
     }
@@ -701,8 +733,8 @@ public class Grid : MonoBehaviour
 
     public Vector2 GetWorldPosition(int x, int y)
     {
-        return new Vector2((transform.position.x - xSize / 2.0f + x) - gridOffsetXPosition,
-            (transform.position.y + ySize / 2.0f - y) - gridOffsetYPosition);
+        return new Vector2((transform.position.x - Xsize / 2.0f + x) - GridOffsetXPosition,
+            (transform.position.y + Ysize / 2.0f - y) - GridOffsetYPosition);
     }
 
     public static bool In<T>(T x, params T[] values)
@@ -714,9 +746,9 @@ public class Grid : MonoBehaviour
     {
         List<Tile> tilesOfType = new List<Tile>();
 
-        for (int x = 0; x < xSize; x++)
+        for (int x = 0; x < Xsize; x++)
         {
-            for (int y = 0; y < ySize; y++)
+            for (int y = 0; y < Ysize; y++)
             {
                 if (tiles[x, y].Type == type)
                 {
@@ -731,9 +763,9 @@ public class Grid : MonoBehaviour
     {
         List<Tile> TilesOfCake = new List<Tile>();
 
-        for (int x = 0; x < xSize; x++)
+        for (int x = 0; x < Xsize; x++)
         {
-            for (int y = 0; y < ySize; y++)
+            for (int y = 0; y < Ysize; y++)
             {
                 if (tiles[x,y].Cake == cake)
                 {
