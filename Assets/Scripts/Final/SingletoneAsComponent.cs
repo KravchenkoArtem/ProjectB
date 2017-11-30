@@ -43,7 +43,8 @@ public class SingletoneAsComponent<T> : MonoBehaviour where T : SingletoneAsComp
         }
     }
 
-    private void Awake()
+
+    void Awake()
     {
         if (ShouldBeSetToDontDestroyOnLoadDuringAwake())
         {

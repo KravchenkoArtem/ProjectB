@@ -38,13 +38,9 @@ public class Sound
     }
 }
 
-public class AudioManager : MonoBehaviour //SingletoneAsComponent<AudioManager>
+public class AudioManager : MonoBehaviour
 {
-    //public static AudioManager Instance
-    //{
-    //    get { return ((AudioManager)_Instance); }
-    //    set { _Instance = value; }
-    //}
+    public static AudioManager Instance;
 
     public bool soundMute
     {
@@ -55,15 +51,34 @@ public class AudioManager : MonoBehaviour //SingletoneAsComponent<AudioManager>
     [SerializeField]
     Sound[] sounds;
 
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            if (Instance != this)
+            {
+                Destroy(this.gameObject);
+            }
+        }
+        else
+        {
+            Instance = this;
+            DontDestroyOnLoad(this);
+        }
+    }
+
     private void Start()
     {
-        for (int i = 0; i < sounds.Length; i++)
+        if (sounds != null)
         {
-            GameObject go = new GameObject(string.Format("Sound_{0}_{1}", i, sounds[i].NumberAudio));
-            go.transform.SetParent(transform);
-            sounds[i].SetSource(go.AddComponent<AudioSource>());
+            for (int i = 0; i < sounds.Length; i++)
+            {
+                GameObject go = new GameObject(string.Format("Sound_{0}_{1}", i, sounds[i].NumberAudio));
+                go.transform.SetParent(transform);
+                sounds[i].SetSource(go.AddComponent<AudioSource>());
+            }
+            PlaySound(0);
         }
-        PlaySound(0);
     }
 
     public void PlaySound(int num)

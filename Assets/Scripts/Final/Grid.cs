@@ -74,8 +74,6 @@ public class Grid : MonoBehaviour
 
     public bool IsFilling = false;
 
-    public bool IsPause = false;
-
     [SerializeField]
     List<Tile> goTile = new List<Tile>();
 
@@ -139,11 +137,6 @@ public class Grid : MonoBehaviour
 
     public IEnumerator Fill()
     {
-        while (IsPause)
-        {
-            yield return null;
-        }
-
         bool needsRefill = true;
         IsFilling = true;
         while (needsRefill)
@@ -245,7 +238,7 @@ public class Grid : MonoBehaviour
             {
                 Destroy(tileBelow.gameObject);
 
-                if (Random.Range(0, 65) == 1)
+                if (Random.Range(0, 40) == 1)
                 {
                     GameObject boombTile = Instantiate(tilePrefabDict[TileType.BOOMB], GetWorldPosition(x, -1), Quaternion.identity);
                     boombTile.transform.parent = transform;
@@ -500,6 +493,7 @@ public class Grid : MonoBehaviour
                         if (match.Count >= 4)
                         {
                             ClearCake(match[0].Cake);
+                            needsRefill = true;
                         }
 
                         for (int i = 0; i < match.Count; i++)
@@ -524,7 +518,7 @@ public class Grid : MonoBehaviour
             tiles[x, y].Clear();
             SpawnNewTile(x, y, TileType.EMPTY);
 
-            ClearObstacles(x, y);
+            ClearSpecialTile(x, y);
 
             return true;
         }
@@ -532,7 +526,7 @@ public class Grid : MonoBehaviour
         return false;
     }
 
-    public void ClearObstacles(int x, int y)
+    public void ClearSpecialTile(int x, int y)
     {
         for (int NearX = x - 1; NearX <= x + 1; NearX++)
         {
@@ -546,7 +540,7 @@ public class Grid : MonoBehaviour
                     {
                         if (tiles[NearX, y].Type == TileType.BOOMB)
                         {
-                            ClearRow(NearX);
+                            Level.OnMove();
                         }
                         goTile.Remove(tiles[NearX, y]);
                         tiles[NearX, y].Clear();
@@ -569,7 +563,7 @@ public class Grid : MonoBehaviour
                     {
                         if (tiles[x, NearY].Type == TileType.BOOMB)
                         {
-                            ClearColumn(NearY);
+                            Level.OnMove();
                         }
                         goTile.Remove(tiles[x, NearY]);
                         tiles[x, NearY].Clear();
@@ -577,22 +571,6 @@ public class Grid : MonoBehaviour
                     }
                 }
             }
-        }
-    }
-
-    public void ClearRow(int row)
-    {
-        for (int x = 0; x < Xsize; x++)
-        {
-            ClearTile(x, row);
-        }
-    }
-
-    public void ClearColumn(int column)
-    {
-        for (int y = 0; y < Ysize; y++)
-        {
-            ClearTile(column, y);
         }
     }
 

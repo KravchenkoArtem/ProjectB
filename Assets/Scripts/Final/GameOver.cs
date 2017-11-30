@@ -14,22 +14,16 @@ public class GameOver : MonoBehaviour
     public Image GameOverTitle;
     public Button playButton;
 
-    SceneController sceneController;
+    LevelManager levelManger;
 
     private void Start()
     {
-        sceneController = SceneController.Instance;
-        if (sceneController == null)
+        levelManger = LevelManager.Instance;
+        if (levelManger == null)
         {
-            Debug.LogError("SceneController not found!");
+            Debug.LogError("LevelManager not found!");
         }
-
         GameOverPanel.SetActive(false);
-
-        for (int i = 0; i < Stars.Length; i++)
-        {
-            Stars[i].enabled = false;
-        }
     }
 
     public void ShowLose(int score)
@@ -51,12 +45,25 @@ public class GameOver : MonoBehaviour
         GameOverPanel.SetActive(true);
         WinLoseText.text = "Stage is done";
         GameOverTitle.color = Color.white;
-        playButton.gameObject.SetActive(true);
+        if (levelManger.CurLevel >= levelManger.MaxLevel)
+        {
+            playButton.gameObject.SetActive(false);
+        }
+        else
+        {
+            playButton.gameObject.SetActive(true);
+
+        }
 
         ScoreText.text = score.ToString();
-        if (score > PlayerPrefs.GetInt(SceneManager.GetActiveScene().name, score))
+        if (score > PlayerPrefs.GetInt(SceneManager.GetActiveScene().name, 0))
         {
             PlayerPrefs.SetInt(SceneManager.GetActiveScene().name, score);
+        }
+
+        if (starCount > PlayerPrefs.GetInt(SceneManager.GetActiveScene().name + 1, 0))
+        {
+            PlayerPrefs.SetInt(SceneManager.GetActiveScene().name + 1, starCount);
         }
 
         BestScoreText.text = PlayerPrefs.GetInt(SceneManager.GetActiveScene().name, score).ToString();
@@ -85,21 +92,21 @@ public class GameOver : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        sceneController.GoToMainMenu();
+        levelManger.GoToMainMenu();
     }
 
     public void ClickReplay()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        levelManger.RestartCurrent();
     }
 
     public void ClickMoveNextLevel()
     {
-        //  SceneManager.LoadScene("cur level + 1");
+        levelManger.GoToNext();
     }
 
     public void ClickBack()
     {
-        //SceneManager.LoadScene("level select");
+        levelManger.GoToMainMenu();
     }
 }

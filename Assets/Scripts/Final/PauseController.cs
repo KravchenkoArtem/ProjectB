@@ -1,54 +1,50 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class PauseController : MonoBehaviour {
-
-    private SceneController sceneController;
+public class PauseController : MonoBehaviour
+{
 
     [SerializeField]
     private Animator animator;
 
-    private void Start()
-    {
-        sceneController = SceneController.Instance;
-        if (sceneController == null)
-        {
-            Debug.LogError("SceneController not found!");
-        }
-    }
+    [SerializeField]
+    private GameObject tutorPanel;
+
+    [SerializeField]
+    private Button pauseButton;
 
     private bool pauseActive;
 
-    private void Update()
+    public void ClickPauseButton()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        pauseActive = !pauseActive;
+        if (pauseActive)
         {
-            pauseActive = !pauseActive;
-            if (pauseActive)
-            {
-                OnPause();
-            }
-            else
-            {
-                OffPause();
-            }
+            OnPause();
+        }
+        else
+        {
+            OffPause();
         }
     }
 
     private void OnPause()
     {
+        pauseButton.interactable = false;
+        pauseButton.image.enabled = false;
         animator.SetBool("Paused", true);
-        //Grid.instance.IsPause = true; // кривая пауза.
         //Time.timeScale = 0;
         pauseActive = true;
     }
 
     public void OffPause()
     {
+        pauseButton.interactable = true;
+        pauseButton.image.enabled = true;
         animator.SetBool("Options", false);
         animator.SetBool("Paused", false);
-        //Grid.instance.IsPause = false;
         //Time.timeScale = 1;
         pauseActive = false;
     }
@@ -61,5 +57,15 @@ public class PauseController : MonoBehaviour {
     public void TransitionToPause()
     {
         animator.SetBool("Options", false);
+    }
+
+    public void ShowPanelTutorial()
+    {
+        tutorPanel.SetActive(true);
+    }
+
+    public void HidePanelTutorial()
+    {
+        tutorPanel.SetActive(false);
     }
 }
