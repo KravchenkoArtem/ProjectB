@@ -104,21 +104,29 @@ public class HUD : MonoBehaviour
     {
         switch (type)
         {
-            case Level.LevelType.MOVES:
+            case Level.LevelType.SCOREMOVES:
                 remainingSubText.text = "Moves Left";
                 targetText.text =  string.Format("Target Score:");
                 break;
-            case Level.LevelType.OBSTACLE:
+            case Level.LevelType.OBSTACLEMOVES:
                 remainingSubText.text = "Moves Left";
                 targetText.text = string.Format("Ice Left:");
                 break;
-            case Level.LevelType.TARGETCAKE:
+            case Level.LevelType.TARGETMOVES:
                 remainingSubText.text = "Moves Left";
                 targetText.text = string.Format("Cakes Left:");
                 break;
-            case Level.LevelType.TIMER:
+            case Level.LevelType.SCORETIMER:
                 remainingSubText.text = "Time Left";
                 targetText.text = string.Format("Target Score:");
+                break;
+            case Level.LevelType.OBSTACLETIMER:
+                remainingSubText.text = "Time Left";
+                targetText.text = string.Format("Ice Left:");
+                break;
+            case Level.LevelType.TARGETTIMER:
+                remainingSubText.text = "Time Left";
+                targetText.text = string.Format("Cakes Left:");
                 break;
         }
     }

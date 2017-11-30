@@ -2,23 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelObstacles : Level
+public class ObstacleMoveLevel : Level
 {
     public int numMoves = 0;
-    public Grid.TileType[] obstacleTypes;
+    public Grid.TileType[] ObstacleTypes;
 
     private int movesUsed = 0;
+    [SerializeField]
     private int numObstacleLeft;
-    [HideInInspector]
     public int NumObstacleLeft { get { return numObstacleLeft; } set { numObstacleLeft = Mathf.Clamp(value, 0, numObstacleLeft); } }
 
     private void Start()
     {
-        type = LevelType.OBSTACLE;
+        type = LevelType.OBSTACLEMOVES;
 
-        for (int i = 0; i < obstacleTypes.Length; i++)
+        for (int i = 0; i < ObstacleTypes.Length; i++)
         {
-            NumObstacleLeft += grid.GetTilesOfType(obstacleTypes[i]).Count;
+            NumObstacleLeft += grid.GetTilesOfType(ObstacleTypes[i]).Count;
         }
 
         hud.SetLevelType(type);
@@ -43,9 +43,9 @@ public class LevelObstacles : Level
     {
         base.OnTileCleared(tile);
 
-        for (int i = 0; i < obstacleTypes.Length; i++)
+        for (int i = 0; i < ObstacleTypes.Length; i++)
         {
-            if (obstacleTypes[i] == tile.Type)
+            if (ObstacleTypes[i] == tile.Type)
             {
                 if (tile.obstacleDurability <= 0)
                 {
@@ -54,7 +54,7 @@ public class LevelObstacles : Level
 
                     if (numObstacleLeft == 0)
                     {
-                        currentScore += 120 * (numMoves - movesUsed);
+                        currentScore += 20 * (numMoves - movesUsed);
                         hud.SetScore(currentScore);
                         GameWin();
                     }

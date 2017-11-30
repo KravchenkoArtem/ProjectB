@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelTimer : Level
+public class ScoreTimeLevel : Level
 {
     public int timeInSeconds;
     public int targetScore;
@@ -12,7 +12,7 @@ public class LevelTimer : Level
 
     private void Start()
     {
-        type = LevelType.TIMER;
+        type = LevelType.SCORETIMER;
 
         hud.SetLevelType(type);
         hud.SetScore(currentScore);
@@ -36,7 +36,7 @@ public class LevelTimer : Level
             {
                 if (currentScore >= targetScore)
                 {
-                    currentScore += 50 * (int)(timeInSeconds - timer);
+                    currentScore += 20 * (int)(timeInSeconds - timer);
                     GameWin();
                 }
                 else

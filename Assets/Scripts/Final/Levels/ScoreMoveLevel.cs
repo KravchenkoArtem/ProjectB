@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelMoves : Level
+public class ScoreMoveLevel : Level
 {
     public int numMoves;
     public int targetScore;
@@ -12,7 +12,7 @@ public class LevelMoves : Level
 
     private void Start()
     {
-        type = LevelType.MOVES;
+        type = LevelType.SCOREMOVES;
 
         hud.SetLevelType(type);
         hud.SetScore(currentScore);

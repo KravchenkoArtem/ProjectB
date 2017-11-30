@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelTarget : Level
+public class TargetMoveLevel : Level
 {
     public int numMoves = 0;
     public Tile.CakeType cakeType;
@@ -15,7 +15,7 @@ public class LevelTarget : Level
 
     private void Start()
     {
-        type = LevelType.TARGETCAKE;
+        type = LevelType.TARGETMOVES;
 
         hud.SetLevelType(type);
         hud.SetScore(currentScore);
@@ -47,7 +47,7 @@ public class LevelTarget : Level
 
             if (NumTargetLeft == 0)
             {
-                currentScore += 100 * (numMoves - movesUsed);
+                currentScore += 30 * (numMoves - movesUsed);
                 hud.SetScore(currentScore);
                 GameWin();
             }

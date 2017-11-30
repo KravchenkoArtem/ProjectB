@@ -641,7 +641,7 @@ public class Grid : MonoBehaviour
 
                 StartCoroutine(Fill());
 
-                if (Level.Type != Level.LevelType.TIMER)
+                if (Level.Type != Level.LevelType.SCORETIMER)
                 {
                     Level.OnMove();
                 }

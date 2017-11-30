@@ -4,12 +4,15 @@ using UnityEngine;
 
 public class Level : MonoBehaviour
 {
+    // Target - Score,Obstacle,TargetCake // Сonstraints - Moves, Timer.
     public enum LevelType
     {
-        TIMER,
-        OBSTACLE,
-        MOVES,
-        TARGETCAKE
+        OBSTACLETIMER,
+        SCORETIMER,
+        TARGETTIMER,
+        OBSTACLEMOVES,
+        SCOREMOVES,
+        TARGETMOVES
     };
 
     protected Grid grid;
