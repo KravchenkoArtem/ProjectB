@@ -13,7 +13,14 @@ public class Sound
     [Range(0.5f, 1.5f)]
     public float Pitch = 1.0f;
 
+    [Range(0.1f, 0.5f)]
+    public float RandomValue = 0.1f;
+    [Range(0.1f, 0.5f)]
+    public float RandomPitch = 0.1f;
+
+
     public bool Loop;
+    public bool PlayOnAwake;
 
     private AudioSource source;
 
@@ -22,6 +29,7 @@ public class Sound
         source = _source;
         source.clip = Clip;
         source.loop = Loop;
+        source.playOnAwake = PlayOnAwake;
         source.outputAudioMixerGroup = AudioMixer;
     }
 
@@ -38,16 +46,29 @@ public class Sound
     }
 }
 
-public class AudioManager : MonoBehaviour
+public class AudioManager : SingletoneAsComponent<AudioManager>
 {
-    public static AudioManager Instance;
-
-    public bool soundMute
+    public static AudioManager Instance
     {
-        get { return AudioListener.pause; }
-        set { AudioListener.pause = value; }
+        get { return ((AudioManager)_Instance); }
+        set { _Instance = value; }
     }
 
+    private bool soundMute;
+    public bool SoundMute
+    {
+        get { return soundMute; }
+        set
+        {
+            soundMute = value;
+            MuteSwitch(soundMute);
+        }
+    }
+
+    [SerializeField]
+    private AudioMixerSnapshot play;
+    [SerializeField]
+    private AudioMixerSnapshot pause;
     [SerializeField]
     Sound[] sounds;
 
@@ -65,10 +86,8 @@ public class AudioManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(this);
         }
-    }
 
-    private void Start()
-    {
+
         if (sounds != null)
         {
             for (int i = 0; i < sounds.Length; i++)
@@ -77,7 +96,6 @@ public class AudioManager : MonoBehaviour
                 go.transform.SetParent(transform);
                 sounds[i].SetSource(go.AddComponent<AudioSource>());
             }
-            PlaySound(0);
         }
     }
 
@@ -104,5 +122,17 @@ public class AudioManager : MonoBehaviour
             }
         }
         Debug.LogWarning("AudioManager: Sound not found in list, " + num);
+    }
+
+    private void MuteSwitch(bool interactable)
+    {
+        if (interactable)
+        {
+            play.TransitionTo(0.1f);
+        }
+        else
+        {
+            pause.TransitionTo(0.1f);
+        }
     }
 }

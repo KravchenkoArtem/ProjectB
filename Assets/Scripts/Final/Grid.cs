@@ -7,6 +7,8 @@ public class Grid : MonoBehaviour
 {
     public static Grid instance;
 
+    private AudioManager audioManager;
+
     public enum TileType
     {
         EMPTY,
@@ -81,6 +83,11 @@ public class Grid : MonoBehaviour
     {
         Level = GameObject.FindGameObjectWithTag("GM").GetComponent<Level>();
         instance = GetComponent<Grid>();
+        audioManager = AudioManager.Instance;
+        if (audioManager == null)
+        {
+            Debug.LogError("AudioManager not found!");
+        }
         CreateGrid(changingGridX, changingGridY, changingGrid);
     }
 
@@ -664,6 +671,7 @@ public class Grid : MonoBehaviour
         bool isShuffle = false;
         if (!IsFilling && !isShuffle)
         {
+            audioManager.PlaySound(0);
             isShuffle = true;
             for (int i = 0; i < goTile.Count; i++)
             {
@@ -735,23 +743,6 @@ public class Grid : MonoBehaviour
             }
         }
         return tilesOfType;
-    }
-
-    public List<Tile> GetCakesOfType(Tile.CakeType cake)
-    {
-        List<Tile> TilesOfCake = new List<Tile>();
-
-        for (int x = 0; x < Xsize; x++)
-        {
-            for (int y = 0; y < Ysize; y++)
-            {
-                if (tiles[x,y].Cake == cake)
-                {
-                    TilesOfCake.Add(tiles[x, y]);
-                }
-            }
-        }
-        return TilesOfCake;
     }
 }
 

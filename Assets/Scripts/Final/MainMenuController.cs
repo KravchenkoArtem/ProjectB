@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEditor;
 using UnityEngine.UI;
+using UnityEngine.Audio;
+
 
 public class MainMenuController : MonoBehaviour
 {
@@ -16,8 +17,9 @@ public class MainMenuController : MonoBehaviour
     private LevelSelectInfo[] levelSelectInfo;
 
     private AudioManager audioManager;
-    private LevelManager levelManger;
+    [SerializeField]
 
+    private LevelManager levelManger;
     private bool levelSelect = false;
 
     private Animator animatorCanvasMainMenu;
@@ -25,6 +27,13 @@ public class MainMenuController : MonoBehaviour
     [SerializeField]
     private GameObject tutorialPanel;
     private Transform levels;
+
+    [SerializeField]
+    private Slider sliderMusic;
+    [SerializeField]
+    private Slider sliderSFX;
+    [SerializeField]
+    private Toggle toggleSound;
 
     private void Awake()
     {
@@ -42,8 +51,11 @@ public class MainMenuController : MonoBehaviour
         levelManger = LevelManager.Instance;
         if (levelManger == null)
         {
-            Debug.LogError("AudionManager not found!");
+            Debug.LogError("LevelManager not found!");
         }
+        audioManager.StopSound(2);
+        audioManager.PlaySound(1);
+        PlayerSettings.Instance.SetValueUI(sliderMusic, sliderSFX, toggleSound);
         UnlockLevel();
     }
 
@@ -56,15 +68,11 @@ public class MainMenuController : MonoBehaviour
         }
     }
 
-    public void StartLevel(int num)
-    {
-        levelManger.StartLevel(num);
-    }
-
     public void ClickBack()
     {
         if (animatorCanvasMainMenu)
         {
+            PlayerSettings.Instance.GetValueUI(sliderMusic.value, sliderSFX.value, toggleSound.isOn);
             if (levelSelect)
             {
                 animatorCanvasMainMenu.SetBool("SelectLevel", false);
@@ -96,6 +104,11 @@ public class MainMenuController : MonoBehaviour
         }
     }
 
+    public void ClickStartLevel(int num)
+    {
+        levelManger.StartLevel(num);
+    }
+
     public void UnlockLevel()
     {
         if (levels != null)
@@ -113,15 +126,23 @@ public class MainMenuController : MonoBehaviour
         }
     }
 
+    public void OnSFXValue(float value)
+    {
+        PlayerSettings.Instance.OnSFXValue(value);
+    }
+
+    public void OnMusicValue(float value)
+    {
+        PlayerSettings.Instance.OnMusicValue(value);
+    }
+
+    public void OnSoundToggle()
+    {
+        PlayerSettings.Instance.OnSoundToggle();
+    }
+
     public void ClickQuit()
     {
-        if (Application.isEditor)
-        {
-            EditorApplication.isPlaying = false;
-        }
-        else
-        {
-            Application.Quit();
-        }
+        Application.Quit();
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Audio;
 
 public class PauseController : MonoBehaviour
 {
@@ -14,8 +15,32 @@ public class PauseController : MonoBehaviour
 
     [SerializeField]
     private Button pauseButton;
-
     private bool pauseActive;
+
+    [SerializeField]
+    private Slider sliderMusic;
+    [SerializeField]
+    private Slider sliderSFX;
+    [SerializeField]
+    private Toggle toggleSound;
+
+    private AudioManager audioManager;
+
+    private void Awake()
+    {
+        audioManager = AudioManager.Instance;
+        if (audioManager == null)
+        {
+            Debug.LogError("AudioManager not found!");
+        }
+    }
+
+    private void Start()
+    {
+        PlayerSettings.Instance.SetValueUI(sliderMusic, sliderSFX, toggleSound);
+        audioManager.StopSound(1);
+        audioManager.PlaySound(2);
+    }
 
     public void ClickPauseButton()
     {
@@ -49,6 +74,21 @@ public class PauseController : MonoBehaviour
         pauseActive = false;
     }
 
+    public void OnSFXValue(float value)
+    {
+        PlayerSettings.Instance.OnSFXValue(value);
+    }
+
+    public void OnMusicValue(float value)
+    {
+        PlayerSettings.Instance.OnMusicValue(value);
+    }
+
+    public void OnSoundToggle()
+    {
+        PlayerSettings.Instance.OnSoundToggle();
+    }
+
     public void TransitionToOptions()
     {
         animator.SetBool("Options", true);
@@ -56,6 +96,7 @@ public class PauseController : MonoBehaviour
 
     public void TransitionToPause()
     {
+        PlayerSettings.Instance.GetValueUI(sliderMusic.value, sliderSFX.value, toggleSound.isOn);
         animator.SetBool("Options", false);
     }
 
