@@ -55,7 +55,7 @@ public class MainMenuController : MonoBehaviour
         }
         audioManager.StopSound(2);
         audioManager.PlaySound(1);
-        PlayerSettings.Instance.SetValueUI(sliderMusic, sliderSFX, toggleSound);
+        OptionsSettings.Instance.SetValueUI(sliderMusic, sliderSFX, toggleSound);
         UnlockLevel();
     }
 
@@ -72,7 +72,7 @@ public class MainMenuController : MonoBehaviour
     {
         if (animatorCanvasMainMenu)
         {
-            PlayerSettings.Instance.GetValueUI(sliderMusic.value, sliderSFX.value, toggleSound.isOn);
+            OptionsSettings.Instance.GetValueUI(sliderMusic.value, sliderSFX.value, toggleSound.isOn);
             if (levelSelect)
             {
                 animatorCanvasMainMenu.SetBool("SelectLevel", false);
@@ -128,17 +128,17 @@ public class MainMenuController : MonoBehaviour
 
     public void OnSFXValue(float value)
     {
-        PlayerSettings.Instance.OnSFXValue(value);
+        OptionsSettings.Instance.OnSFXValue(value);
     }
 
     public void OnMusicValue(float value)
     {
-        PlayerSettings.Instance.OnMusicValue(value);
+        OptionsSettings.Instance.OnMusicValue(value);
     }
 
     public void OnSoundToggle()
     {
-        PlayerSettings.Instance.OnSoundToggle();
+        OptionsSettings.Instance.OnSoundToggle();
     }
 
     public void ClickQuit()

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
-public class PlayerSettings : SingletoneAsComponent<PlayerSettings> {
+public class OptionsSettings : SingletoneAsComponent<OptionsSettings> {
 
-    public static PlayerSettings Instance
+    public static OptionsSettings Instance
     {
-        get { return ((PlayerSettings)_Instance); }
+        get { return ((OptionsSettings)_Instance); }
         set { _Instance = value; }
     }
 

@@ -37,7 +37,7 @@ public class PauseController : MonoBehaviour
 
     private void Start()
     {
-        PlayerSettings.Instance.SetValueUI(sliderMusic, sliderSFX, toggleSound);
+        OptionsSettings.Instance.SetValueUI(sliderMusic, sliderSFX, toggleSound);
         audioManager.StopSound(1);
         audioManager.PlaySound(2);
     }
@@ -76,17 +76,17 @@ public class PauseController : MonoBehaviour
 
     public void OnSFXValue(float value)
     {
-        PlayerSettings.Instance.OnSFXValue(value);
+        OptionsSettings.Instance.OnSFXValue(value);
     }
 
     public void OnMusicValue(float value)
     {
-        PlayerSettings.Instance.OnMusicValue(value);
+        OptionsSettings.Instance.OnMusicValue(value);
     }
 
     public void OnSoundToggle()
     {
-        PlayerSettings.Instance.OnSoundToggle();
+        OptionsSettings.Instance.OnSoundToggle();
     }
 
     public void TransitionToOptions()
@@ -96,7 +96,7 @@ public class PauseController : MonoBehaviour
 
     public void TransitionToPause()
     {
-        PlayerSettings.Instance.GetValueUI(sliderMusic.value, sliderSFX.value, toggleSound.isOn);
+        OptionsSettings.Instance.GetValueUI(sliderMusic.value, sliderSFX.value, toggleSound.isOn);
         animator.SetBool("Options", false);
     }
 

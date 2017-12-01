@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = System.Random;
 
 public class Level : MonoBehaviour
 {
-    // Target - Score,Obstacle,TargetCake // Сonstraints - Moves, Timer.
+    // Target - Score, Obstacle, TargetCake. // Сonstraints - Moves, Timer.
     public enum LevelType
     {
         OBSTACLETIMER,
@@ -81,5 +82,12 @@ public class Level : MonoBehaviour
         {
             hud.OnGameLose(currentScore);
         }
+    }
+
+    public Tile.CakeType RandomizeCakeType()
+    {
+        Tile.CakeType[] cakes = { Tile.CakeType.BIGCAKE, Tile.CakeType.BLACKCAKE, Tile.CakeType.CROISSANTCAKE, Tile.CakeType.PINKCAKE, Tile.CakeType.REDCAKE, Tile.CakeType.WHITECAKE, Tile.CakeType.YELLOWCAKE };
+        Random random = new Random();
+        return cakes[random.Next(cakes.Length)];
     }
 }

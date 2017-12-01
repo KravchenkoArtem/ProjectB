@@ -15,10 +15,10 @@ public class Tile : MonoBehaviour
 
     public Grid.TileType Type;
 
-    public Grid grid;
+    private Grid grid;
 
     public bool IsClearable = false;
-    public bool isBeginCleared = false;
+    public bool IsBeginCleared = false;
     [SerializeField]
     private AnimationClip clearAnimation;
     [SerializeField]
@@ -36,7 +36,7 @@ public class Tile : MonoBehaviour
         public Sprite sprite;
     };
 
-    public CakeSprite[] cakeSprites;
+    public CakeSprite[] CakeSprites;
 
     private CakeType cake;
 
@@ -48,18 +48,18 @@ public class Tile : MonoBehaviour
 
     public int NumCakes
     {
-        get { return cakeSprites.Length; }
+        get { return CakeSprites.Length; }
     }
 
     private SpriteRenderer sprite;
 
-    private Dictionary<CakeType, Sprite> cakeSpriteDict;
+    public Dictionary<CakeType, Sprite> cakeSpriteDict;
 
     public int obstacleDurability = 2;
 
     private void Awake()
     {
-        grid = Grid.instance;
+        grid = Grid.Instance;
 
         if (!IsCake)
             return;
@@ -67,11 +67,11 @@ public class Tile : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
         cakeSpriteDict = new Dictionary<CakeType, Sprite>();
 
-        for (int i = 0; i < cakeSprites.Length; i++)
+        for (int i = 0; i < CakeSprites.Length; i++)
         {
-            if (!cakeSpriteDict.ContainsKey(cakeSprites[i].cake))
+            if (!cakeSpriteDict.ContainsKey(CakeSprites[i].cake))
             {
-                cakeSpriteDict.Add(cakeSprites[i].cake, cakeSprites[i].sprite);
+                cakeSpriteDict.Add(CakeSprites[i].cake, CakeSprites[i].sprite);
             }
         }
     }
@@ -118,7 +118,7 @@ public class Tile : MonoBehaviour
 
         grid.Level.OnTileCleared(this);
 
-        isBeginCleared = true;
+        IsBeginCleared = true;
         StartCoroutine(ClearCoroutine());
     }
 
@@ -156,7 +156,7 @@ public class Tile : MonoBehaviour
                 grid.SelectTile(this);
                 Select();
             }
-            else if (grid.SelectedTile != transform && !grid.movedTile)
+            else if (grid.SelectedTile != transform && !grid.MovingTile)
             {
                 grid.MoveTile(this);
                 grid.MovedTile();
@@ -174,6 +174,6 @@ public class Tile : MonoBehaviour
     {
         selector.SetActive(false);
         grid.SelectedTile = null;
-        grid.movedTile = null;
+        grid.MovingTile = null;
     }
 }

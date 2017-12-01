@@ -31,14 +31,6 @@ public class LevelManager : MonoBehaviour
         UpdateData(PlayerPrefs.GetInt("CurLevel"), 8);
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            PlayerPrefs.DeleteAll();
-        }
-    }
-
     public void GoToNext()
     {
         if (CurLevel < MaxLevel)
@@ -69,8 +61,7 @@ public class LevelManager : MonoBehaviour
 
     public void RestartCurrent()
     {
-        string name = "Level" + CurLevel;
-        SceneManager.LoadScene(name);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void GoToMainMenu()

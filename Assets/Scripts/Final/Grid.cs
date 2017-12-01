@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Grid : MonoBehaviour
 {
-    public static Grid instance;
+    public static Grid Instance;
 
     private AudioManager audioManager;
 
@@ -33,8 +33,8 @@ public class Grid : MonoBehaviour
         public int y;
     };
 
-    public int Xsize;
-    public int Ysize;
+    public int XSize;
+    public int YSize;
     [SerializeField]
     private int[] changingGridX = new int[] { 2, 3, 4, 5 };
     [SerializeField]
@@ -49,8 +49,10 @@ public class Grid : MonoBehaviour
     [SerializeField]
     private bool obstacleGrid = false;
 
-    public float GridOffsetXPosition;
-    public float GridOffsetYPosition;
+    [SerializeField]
+    private float gridOffsetXPosition;
+    [SerializeField]
+    private float gridOffsetYPosition;
 
 
     public float FillTime; // время заполнения
@@ -58,31 +60,27 @@ public class Grid : MonoBehaviour
     [HideInInspector]
     public Level Level;
 
-    public TilePrefab[] tilePrefabs;
-    public GameObject backgroundPrefab;
-
+    public TilePrefab[] TilePrefabs;
+    public GameObject BackgroundPrefab;
     private Dictionary<TileType, GameObject> tilePrefabDict;
-
-    [SerializeField]
     private Tile[,] tiles;
-
-    private bool inverse = false;
-
+    private List<Tile> goTile = new List<Tile>();
+   
+    [HideInInspector]
     public Tile SelectedTile;
-    public Tile movedTile;
+    [HideInInspector]
+    public Tile MovingTile;
 
     [HideInInspector]
     public bool GameOver = false;
-
+    private bool inverse = false;
     public bool IsFilling = false;
 
-    [SerializeField]
-    List<Tile> goTile = new List<Tile>();
 
     private void Awake()
     {
         Level = GameObject.FindGameObjectWithTag("GM").GetComponent<Level>();
-        instance = GetComponent<Grid>();
+        Instance = GetComponent<Grid>();
         audioManager = AudioManager.Instance;
         if (audioManager == null)
         {
@@ -95,19 +93,19 @@ public class Grid : MonoBehaviour
     {
         tilePrefabDict = new Dictionary<TileType, GameObject>();
 
-        for (int i = 0; i < tilePrefabs.Length; i++)
+        for (int i = 0; i < TilePrefabs.Length; i++)
         {
-            if (!tilePrefabDict.ContainsKey(tilePrefabs[i].type))
+            if (!tilePrefabDict.ContainsKey(TilePrefabs[i].type))
             {
-                tilePrefabDict.Add(tilePrefabs[i].type, tilePrefabs[i].prefab);
+                tilePrefabDict.Add(TilePrefabs[i].type, TilePrefabs[i].prefab);
             }
         }
 
-        tiles = new Tile[Xsize, Ysize];
+        tiles = new Tile[XSize, YSize];
 
-        for (int x = 0; x < Xsize; x++)
+        for (int x = 0; x < XSize; x++)
         {
-            for (int y = 0; y < Ysize; y++)
+            for (int y = 0; y < YSize; y++)
             {
                 if (obstacleGrid)
                 {
@@ -131,7 +129,7 @@ public class Grid : MonoBehaviour
                         }
                     }
                 }
-                GameObject obj = Instantiate(backgroundPrefab, GetWorldPosition(x, y), Quaternion.identity);
+                GameObject obj = Instantiate(BackgroundPrefab, GetWorldPosition(x, y), Quaternion.identity);
                 obj.transform.parent = transform;
                 if (tiles[x, y] == null)
                 {
@@ -164,14 +162,14 @@ public class Grid : MonoBehaviour
     {
         bool movedTile = false;
 
-        for (int y = Ysize - 2; y >= 0; y--)
+        for (int y = YSize - 2; y >= 0; y--)
         {
-            for (int loopX = 0; loopX < Xsize; loopX++)
+            for (int loopX = 0; loopX < XSize; loopX++)
             {
                 int x = loopX;
                 if (inverse)
                 {
-                    x = Xsize - 1 - loopX;
+                    x = XSize - 1 - loopX;
                 }
                 Tile tile = tiles[x, y];
                 if (tile.IsMovable)
@@ -198,7 +196,7 @@ public class Grid : MonoBehaviour
                                     diagX = x - diag;
                                 }
 
-                                if (diagX >= 0 && diagX < Xsize)
+                                if (diagX >= 0 && diagX < XSize)
                                 {
                                     Tile diagonalTile = tiles[diagX, y + 1];
 
@@ -238,7 +236,7 @@ public class Grid : MonoBehaviour
                 }
             }
         }
-        for (int x = 0; x < Xsize; x++)
+        for (int x = 0; x < XSize; x++)
         {
             Tile tileBelow = tiles[x, 0];
             if (tileBelow.Type == TileType.EMPTY)
@@ -288,7 +286,7 @@ public class Grid : MonoBehaviour
 
             for (int dir = 0; dir <= 1; dir++)
             {
-                for (int xOffset = 1; xOffset < Xsize; xOffset++)
+                for (int xOffset = 1; xOffset < XSize; xOffset++)
                 {
                     int x;
 
@@ -301,7 +299,7 @@ public class Grid : MonoBehaviour
                         x = newX + xOffset;
                     }
 
-                    if (x < 0 || x >= Xsize)
+                    if (x < 0 || x >= XSize)
                     {
                         break;
                     }
@@ -331,7 +329,7 @@ public class Grid : MonoBehaviour
                 {
                     for (int dir = 0; dir <= 1; dir++)
                     {
-                        for (int yOffset = 1; yOffset < Ysize; yOffset++)
+                        for (int yOffset = 1; yOffset < YSize; yOffset++)
                         {
                             int y;
 
@@ -344,7 +342,7 @@ public class Grid : MonoBehaviour
                                 y = newY + yOffset;
                             }
 
-                            if (y < 0 || y >= Ysize)
+                            if (y < 0 || y >= YSize)
                             {
                                 break;
                             }
@@ -387,7 +385,7 @@ public class Grid : MonoBehaviour
 
             for (int dir = 0; dir <= 1; dir++)
             {
-                for (int yOffset = 1; yOffset < Ysize; yOffset++)
+                for (int yOffset = 1; yOffset < YSize; yOffset++)
                 {
                     int y;
 
@@ -400,7 +398,7 @@ public class Grid : MonoBehaviour
                         y = newY + yOffset;
                     }
 
-                    if (y < 0 || y >= Ysize)
+                    if (y < 0 || y >= YSize)
                     {
                         break;
                     }
@@ -430,7 +428,7 @@ public class Grid : MonoBehaviour
                 {
                     for (int dir = 0; dir <= 1; dir++)
                     {
-                        for (int xOffset = 1; xOffset < Xsize; xOffset++)
+                        for (int xOffset = 1; xOffset < XSize; xOffset++)
                         {
                             int x;
 
@@ -443,7 +441,7 @@ public class Grid : MonoBehaviour
                                 x = newX + xOffset;
                             }
 
-                            if (x < 0 || x >= Xsize)
+                            if (x < 0 || x >= XSize)
                             {
                                 break;
                             }
@@ -487,9 +485,9 @@ public class Grid : MonoBehaviour
     {
         bool needsRefill = false;
 
-        for (int y = 0; y < Ysize; y++)
+        for (int y = 0; y < YSize; y++)
         {
-            for (int x = 0; x < Xsize; x++)
+            for (int x = 0; x < XSize; x++)
             {
                 if (tiles[x, y].IsClearable)
                 {
@@ -519,7 +517,7 @@ public class Grid : MonoBehaviour
 
     public bool ClearTile(int x, int y)
     {
-        if (tiles[x, y].IsClearable && !tiles[x, y].isBeginCleared)
+        if (tiles[x, y].IsClearable && !tiles[x, y].IsBeginCleared)
         {
             goTile.Remove(tiles[x, y]);
             tiles[x, y].Clear();
@@ -537,7 +535,7 @@ public class Grid : MonoBehaviour
     {
         for (int NearX = x - 1; NearX <= x + 1; NearX++)
         {
-            if (NearX != x && NearX >= 0 && NearX < Xsize)
+            if (NearX != x && NearX >= 0 && NearX < XSize)
             {
                 if ((tiles[NearX, y].Type == TileType.ICE || tiles[NearX, y].Type == TileType.BOOMB) && tiles[NearX, y].IsClearable)
                 {
@@ -559,7 +557,7 @@ public class Grid : MonoBehaviour
 
         for (int NearY = y - 1; NearY <= y + 1; NearY++)
         {
-            if (NearY != y && NearY >= 0 && NearY < Ysize)
+            if (NearY != y && NearY >= 0 && NearY < YSize)
             {
                 if ((tiles[x, NearY].Type == TileType.ICE || tiles[x, NearY].Type == TileType.BOOMB) && tiles[x, NearY].IsClearable)
                 {
@@ -583,9 +581,9 @@ public class Grid : MonoBehaviour
 
     public void ClearCake(Tile.CakeType cake)
     {
-        for (int x = 0; x < Xsize; x++)
+        for (int x = 0; x < XSize; x++)
         {
-            for (int y = 0; y < Ysize; y++)
+            for (int y = 0; y < YSize; y++)
             {
                 if (tiles[x, y].IsCake && (tiles[x, y].Cake == cake))
                 {
@@ -602,14 +600,14 @@ public class Grid : MonoBehaviour
 
     public void MoveTile(Tile tile)
     {
-        movedTile = tile;
+        MovingTile = tile;
     }
 
     public void MovedTile()
     {
-        if (IsNear(SelectedTile, movedTile) && (GetMatch(SelectedTile, movedTile.X, movedTile.Y) != null || GetMatch(movedTile, SelectedTile.X, SelectedTile.Y) != null))
+        if (IsNear(SelectedTile, MovingTile) && (GetMatch(SelectedTile, MovingTile.X, MovingTile.Y) != null || GetMatch(MovingTile, SelectedTile.X, SelectedTile.Y) != null))
         {
-            SwapTile(SelectedTile, movedTile);
+            SwapTile(SelectedTile, MovingTile);
         }
         else
         {
@@ -644,7 +642,7 @@ public class Grid : MonoBehaviour
                 ClearAllValidMatches();
 
                 SelectedTile = null;
-                movedTile = null;
+                MovingTile = null;
 
                 StartCoroutine(Fill());
 
@@ -696,7 +694,7 @@ public class Grid : MonoBehaviour
             ClearAllValidMatches();
 
             SelectedTile = null;
-            movedTile = null;
+            MovingTile = null;
 
             Level.OnMove();
 
@@ -719,8 +717,8 @@ public class Grid : MonoBehaviour
 
     public Vector2 GetWorldPosition(int x, int y)
     {
-        return new Vector2((transform.position.x - Xsize / 2.0f + x) - GridOffsetXPosition,
-            (transform.position.y + Ysize / 2.0f - y) - GridOffsetYPosition);
+        return new Vector2((transform.position.x - XSize / 2.0f + x) - gridOffsetXPosition,
+            (transform.position.y + YSize / 2.0f - y) - gridOffsetYPosition);
     }
 
     public static bool In<T>(T x, params T[] values)
@@ -732,9 +730,9 @@ public class Grid : MonoBehaviour
     {
         List<Tile> tilesOfType = new List<Tile>();
 
-        for (int x = 0; x < Xsize; x++)
+        for (int x = 0; x < XSize; x++)
         {
-            for (int y = 0; y < Ysize; y++)
+            for (int y = 0; y < YSize; y++)
             {
                 if (tiles[x, y].Type == type)
                 {

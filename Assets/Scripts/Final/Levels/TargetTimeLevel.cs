@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = System.Random;
 
 public class TargetTimeLevel : Level
 {
-    public Tile.CakeType cakeType;
+    private Tile.CakeType cakeType;
     [SerializeField]
     private int TargetCakesLeft = 10;
     [SerializeField]
@@ -17,6 +18,8 @@ public class TargetTimeLevel : Level
     private void Start()
     {
         type = LevelType.TARGETTIMER;
+
+        cakeType = RandomizeCakeType();
 
         hud.SetLevelType(type);
         hud.SetScore(currentScore);
@@ -61,4 +64,6 @@ public class TargetTimeLevel : Level
             }
         }
     }
+
+    
 }
