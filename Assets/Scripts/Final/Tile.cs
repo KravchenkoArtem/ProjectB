@@ -19,8 +19,11 @@ public class Tile : MonoBehaviour
 
     public bool IsClearable = false;
     public bool IsBeginCleared = false;
+
     [SerializeField]
     private AnimationClip clearAnimation;
+    Animator animator;
+
     [SerializeField]
     private GameObject selector;
 
@@ -60,6 +63,7 @@ public class Tile : MonoBehaviour
     private void Awake()
     {
         grid = Grid.Instance;
+        animator = GetComponent<Animator>();
 
         if (!IsCake)
             return;
@@ -85,7 +89,7 @@ public class Tile : MonoBehaviour
     }
 
     public void Move(int newX, int newY, float time)
-    {        
+    {
         if (!IsMovable)
             return;
 
@@ -111,7 +115,7 @@ public class Tile : MonoBehaviour
         transform.position = grid.GetWorldPosition(newX, newY);
     }
 
-    public virtual void Clear()
+    public virtual void Clear(List<GameObject> list)
     {
         if (!IsClearable)
             return;
@@ -119,18 +123,43 @@ public class Tile : MonoBehaviour
         grid.Level.OnTileCleared(this);
 
         IsBeginCleared = true;
-        StartCoroutine(ClearCoroutine());
+        StartCoroutine(ClearCoroutine(list));
     }
 
-    private IEnumerator ClearCoroutine()
+    private IEnumerator ClearCoroutine(List<GameObject> list)
     {
-        Animator animator = GetComponent<Animator>();
-
         if (animator)
         {
-            animator.Play(clearAnimation.name);
+            animator.Play(clearAnimation.name, -1, 0);
             yield return new WaitForSeconds(clearAnimation.length);
-            Destroy(gameObject);
+            OnDespawnObject(list);
+        }
+    }
+
+    private void OnDespawnObject(List<GameObject> list)
+    {
+        if (list.Count == 0)
+        {
+            return;
+        }
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i].GetInstanceID() == gameObject.GetInstanceID())
+            {
+                Reset();
+                PrefabPoolingSystem.Despawn(list[i]);
+                list.RemoveAt(i);
+            }
+        }
+    }
+
+    private void Reset()
+    {
+        IsBeginCleared = false;
+        animator.Play(clearAnimation.name, -1, 0);
+        if (Type == Grid.TileType.NORMAL)
+        {
+            Deselect();
         }
     }
 
@@ -168,6 +197,7 @@ public class Tile : MonoBehaviour
     public void Select()
     {
         selector.SetActive(true);
+        animator.Play("SelectorAnim");
     }
 
     public void Deselect()
