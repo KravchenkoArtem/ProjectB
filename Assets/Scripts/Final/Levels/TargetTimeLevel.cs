@@ -53,7 +53,7 @@ public class TargetTimeLevel : Level
 
             if (NumTargetLeft <= 0)
             {
-                currentScore += 30 * (int)(timeInSeconds - timer);
+                currentScore += 30 * ((int)(timeInSeconds - timer)/10);
                 hud.SetScore(currentScore);
                 GameWin();
             }

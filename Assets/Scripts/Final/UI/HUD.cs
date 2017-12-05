@@ -39,17 +39,17 @@ public class HUD : MonoBehaviour
     {
         scoreText.text = score.ToString();
 
-        if (score >= level.score1Star && score < level.score2Star)
+        if (score >= level.Score1Star && score < level.Score2Star)
         {
             starIndex = 1;
             stars[0].enabled = true;
         }
-        else if (score >= level.score2Star && score < level.score3Star)
+        else if (score >= level.Score2Star && score < level.Score3Star)
         {
             starIndex = 2;
             stars[1].enabled = true;
         }
-        else if (score >= level.score3Star)
+        else if (score >= level.Score3Star)
         {
             starIndex = 3;
             stars[2].enabled = true;

@@ -7,7 +7,6 @@ public class ScoreMoveLevel : Level
     public int numMoves;
     public int targetScore;
 
-    [SerializeField]
     private int movesUsed = 0;
 
     private void Start()
@@ -27,14 +26,12 @@ public class ScoreMoveLevel : Level
 
         if (numMoves - movesUsed == 0)
         {
-            if (currentScore >= targetScore)
-            {
-                GameWin();
-            }
-            else
-            {
-                GameLose();
-            }
+            GameLose();
+        }
+        if (currentScore >= targetScore)
+        {
+            currentScore += 80 * (numMoves - movesUsed);
+            GameWin();
         }
     }
 }

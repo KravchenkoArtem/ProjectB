@@ -7,7 +7,8 @@ public class LevelManager : MonoBehaviour
 {
     public static LevelManager Instance;
 
-    public int CurLevel { get; private set; }
+    [SerializeField]
+    public int CurLevel;
     public int MaxLevel { get; private set; }
 
     private void Awake()
@@ -35,7 +36,6 @@ public class LevelManager : MonoBehaviour
     {
         if (CurLevel < MaxLevel)
         {
-            CurLevel++;
             string name = "Level" + CurLevel;
             PlayerPrefs.SetInt("CurLevel", CurLevel);
             UpdateData(CurLevel, MaxLevel);
@@ -49,7 +49,9 @@ public class LevelManager : MonoBehaviour
 
     public void StartLevel(int num)
     {
+        CurLevel = num;
         string name = "Level" + num;
+        PlayerPrefs.SetInt("CurLevel", num);
         SceneManager.LoadScene(name);
     }
 
@@ -61,7 +63,8 @@ public class LevelManager : MonoBehaviour
 
     public void RestartCurrent()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        string name = "Level" + CurLevel;
+        SceneManager.LoadScene(name);
     }
 
     public void GoToMainMenu()

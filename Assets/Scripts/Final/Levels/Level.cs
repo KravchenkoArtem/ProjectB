@@ -19,9 +19,9 @@ public class Level : MonoBehaviour
     protected Grid grid;
     protected HUD hud;
 
-    public int score1Star;
-    public int score2Star;
-    public int score3Star;
+    public int Score1Star;
+    public int Score2Star;
+    public int Score3Star;
 
     protected LevelType type;
     public LevelType Type
@@ -57,10 +57,7 @@ public class Level : MonoBehaviour
         StartCoroutine(WaitForGridFill());
     }
 
-    public virtual void OnMove()
-    {
-
-    }
+    public virtual void OnMove() { }
 
     public virtual void OnTileCleared(Tile tile)
     {

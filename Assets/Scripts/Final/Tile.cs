@@ -136,6 +136,27 @@ public class Tile : MonoBehaviour
         }
     }
 
+    public virtual void Clear()
+    {
+        if (!IsClearable)
+            return;
+
+        grid.Level.OnTileCleared(this);
+
+        IsBeginCleared = true;
+        StartCoroutine(ClearCoroutine());
+    }
+
+    private IEnumerator ClearCoroutine()
+    {
+        if (animator)
+        {
+            animator.Play(clearAnimation.name, -1, 0);
+            yield return new WaitForSeconds(clearAnimation.length);
+            Destroy(gameObject);
+        }
+    }
+
     private void OnDespawnObject(List<GameObject> list)
     {
         if (list.Count == 0)

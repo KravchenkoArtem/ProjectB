@@ -33,27 +33,38 @@ public class Grid : MonoBehaviour
         public int y;
     };
 
+    [Header("Grid Size")]
     public int XSize;
     public int YSize;
+
+    [Space]
+    [Header("Grid Empty Space")]
     [SerializeField]
     private int[] changingGridX = new int[] { 2, 3, 4, 5 };
     [SerializeField]
     private int[] changingGridY = new int[] { 0, 6 };
     [SerializeField]
-    private bool changingGrid = false;
+    private bool changingGrid;
 
+    [Space]
+    [Header("Grid Obstacle Space")]
     [SerializeField]
     private int[] addObstacleGridX;
     [SerializeField]
     private int[] addObstacleGridY;
     [SerializeField]
-    private bool obstacleGrid = false;
+    private bool obstacleGrid;
 
+    [Space]
+    [Header("Grid World Position Offset")]
     [SerializeField]
     private float gridOffsetXPosition;
     [SerializeField]
     private float gridOffsetYPosition;
 
+    [SerializeField]
+    [Range(0, 80)]
+    private int probabilitySpawnBomb = 0; 
 
     public float FillTime; // время заполнения
 
@@ -76,8 +87,7 @@ public class Grid : MonoBehaviour
     private bool inverse = false;
     public bool IsFilling = false;
 
-    [SerializeField]
-    List<GameObject> goNormal = new List<GameObject>();
+    private List<GameObject> goNormal = new List<GameObject>();
 
     private void Awake()
     {
@@ -92,13 +102,13 @@ public class Grid : MonoBehaviour
 
     private void Start()
     {
-        goNormal.Clear();
-        CreateGrid(changingGridX, changingGridY, changingGrid);
-        PrefabPoolingSystem.Prespawn(tilePrefabDict[TileType.NORMAL], 1);
+        CreateGrid();
     }
 
-    private void CreateGrid(int[] changingOffsetX, int[] changingOffsetY, bool changingGrid = false)
+    private void CreateGrid()
     {
+        goNormal.Clear();
+        PrefabPoolingSystem.Reset();
         tilePrefabDict = new Dictionary<TileType, GameObject>();
 
         for (int i = 0; i < TilePrefabs.Length; i++)
@@ -128,11 +138,12 @@ public class Grid : MonoBehaviour
 
                 if (changingGrid)
                 {
-                    if (In(x, changingOffsetY))
+                    if (In(x, changingGridY))
                     {
-                        if (In(y, changingOffsetX))
+                        if (In(y, changingGridX))
                         {
                             SpawnNewTile(x, y, TileType.GRIDSPACE);
+                            continue;
                         }
                     }
                 }
@@ -144,6 +155,7 @@ public class Grid : MonoBehaviour
                 }
             }
         }
+        PrefabPoolingSystem.Prespawn(tilePrefabDict[TileType.NORMAL], 1);
         StartCoroutine(Fill());
     }
 
@@ -257,7 +269,7 @@ public class Grid : MonoBehaviour
                 //ClearTile(tileBelow.X, tileBelow.Y, goEmpty);
                 //tiles[tileBelow.X, tileBelow.Y].Clear(goEmpty);
 
-                if (Random.Range(0, 50) == 1)
+                if (Random.Range(0, probabilitySpawnBomb) == 1)
                 {
                     GameObject boombTile = Instantiate(tilePrefabDict[TileType.BOOMB], GetWorldPosition(x, -1), Quaternion.identity);
                     boombTile.transform.parent = transform;
@@ -557,7 +569,7 @@ public class Grid : MonoBehaviour
                         if (tiles[NearX, y].obstacleDurability <= 0)
                         {
                             Destroy(tiles[NearX, y].gameObject);
-                            goTile.Remove(tiles[NearX, y]);
+                            tiles[NearX, y].Clear();
                             SpawnNewTile(NearX, y, TileType.EMPTY);
                         }
                     }
@@ -565,7 +577,8 @@ public class Grid : MonoBehaviour
                     {
                         Level.OnMove();
                         //ClearTile(NearX, y, goBomb);
-                        Destroy(tiles[NearX, y].gameObject);
+                        audioManager.PlaySound(3);
+                        tiles[NearX, y].Clear();
                         goTile.Remove(tiles[NearX, y]);
                         SpawnNewTile(NearX, y, TileType.EMPTY);
                     }
@@ -585,7 +598,7 @@ public class Grid : MonoBehaviour
                         tiles[x, NearY].GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
                         if (tiles[x, NearY].obstacleDurability <= 0)
                         {
-                            Destroy(tiles[x, NearY].gameObject);
+                            tiles[x, NearY].Clear();
                             goTile.Remove(tiles[x, NearY]);
                             SpawnNewTile(x, NearY, TileType.EMPTY);
                         }
@@ -593,7 +606,8 @@ public class Grid : MonoBehaviour
                     if (tiles[x, NearY].Type == TileType.BOOMB)
                     {
                         Level.OnMove();
-                        Destroy(tiles[x, NearY].gameObject);
+                        audioManager.PlaySound(3);
+                        tiles[x, NearY].Clear();
                         goTile.Remove(tiles[x, NearY]);
                         SpawnNewTile(x, NearY, TileType.EMPTY);
                     }
@@ -666,6 +680,7 @@ public class Grid : MonoBehaviour
 
                 SelectedTile = null;
                 MovingTile = null;
+
 
                 StartCoroutine(Fill());
 

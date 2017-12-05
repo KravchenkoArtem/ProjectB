@@ -45,6 +45,7 @@ public class GameOver : MonoBehaviour
         GameOverPanel.SetActive(true);
         WinLoseText.text = "Stage is done";
         GameOverTitle.color = Color.white;
+        levelManger.CurLevel++;
         if (levelManger.CurLevel >= levelManger.MaxLevel)
         {
             playButton.gameObject.SetActive(false);

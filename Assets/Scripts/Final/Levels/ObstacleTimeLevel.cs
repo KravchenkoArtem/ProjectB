@@ -5,8 +5,8 @@ using UnityEngine;
 public class ObstacleTimeLevel : Level
 {
     public Grid.TileType[] ObstacleTypes;
-    private int numObstacleLeft;
-    public int NumObstacleLeft { get { return numObstacleLeft; } set { numObstacleLeft = Mathf.Clamp(value, 0, numObstacleLeft); } }
+    [SerializeField]
+    private int countObstacle;
 
     public int timeInSeconds;
     private float timer;
@@ -18,7 +18,7 @@ public class ObstacleTimeLevel : Level
 
         hud.SetLevelType(type);
         hud.SetScore(currentScore);
-        hud.SetTarget(NumObstacleLeft);
+        hud.SetTarget(countObstacle);
         hud.SetRemaining(string.Format("{0}:{1:00}", timeInSeconds / 60, timeInSeconds % 60));
     }
 
@@ -32,8 +32,8 @@ public class ObstacleTimeLevel : Level
             {
                 if (tile.obstacleDurability <= 0)
                 {
-                    NumObstacleLeft--;
-                    hud.SetTarget(NumObstacleLeft);
+                    countObstacle--;
+                    hud.SetTarget(countObstacle);
                 }
             }
         }
@@ -51,14 +51,14 @@ public class ObstacleTimeLevel : Level
             timer += Time.deltaTime;
             hud.SetRemaining(string.Format("{0}:{1:00}", (int)Mathf.Max((timeInSeconds - timer) / 60, 0), (int)Mathf.Max((timeInSeconds - timer) % 60, 0)));
 
-            if (numObstacleLeft <= 0)
+            if (countObstacle <= 0)
             {
                 currentScore += 30 * (int)(timeInSeconds - timer);
                 hud.SetScore(currentScore);
                 GameWin();
             }
 
-            if (timeInSeconds - timer <= 0 && numObstacleLeft > 0)
+            if (timeInSeconds - timer <= 0 && countObstacle > 0)
             {
                 GameLose();
             }

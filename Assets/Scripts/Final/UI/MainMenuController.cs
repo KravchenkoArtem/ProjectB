@@ -59,6 +59,14 @@ public class MainMenuController : MonoBehaviour
         UnlockLevel();
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            PlayerPrefs.DeleteAll();
+        }
+    }
+
     public void ClickPlay()
     {
         if (animatorCanvasMainMenu)
@@ -114,6 +122,23 @@ public class MainMenuController : MonoBehaviour
         if (levels != null)
         {
             for (int i = 0; i < levelManger.CurLevel; i++)
+            {
+                Transform Child = levels.transform.GetChild(i);
+                Child.gameObject.SetActive(true);
+                levelSelectInfo[i].BestScoreText.text = PlayerPrefs.GetInt("Level" + (i + 1)).ToString();
+                for (int s = 0; s < PlayerPrefs.GetInt(("Level" + (i + 1)) + 1); s++)
+                {
+                    levelSelectInfo[i].StarCount[s].GetComponent<Image>().enabled = true;
+                }
+            }
+        }
+    }
+
+    public void UnlockLevel(int cur)
+    {
+        if (levels != null)
+        {
+            for (int i = 0; i < cur; i++)
             {
                 Transform Child = levels.transform.GetChild(i);
                 Child.gameObject.SetActive(true);

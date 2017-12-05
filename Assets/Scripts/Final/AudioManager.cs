@@ -66,20 +66,6 @@ public class AudioManager : SingletoneAsComponent<AudioManager>
 
     private void Awake()
     {
-        if (Instance != null)
-        {
-            if (Instance != this)
-            {
-                Destroy(this.gameObject);
-            }
-        }
-        else
-        {
-            Instance = this;
-            DontDestroyOnLoad(this);
-        }
-
-
         if (sounds != null)
         {
             for (int i = 0; i < sounds.Length; i++)

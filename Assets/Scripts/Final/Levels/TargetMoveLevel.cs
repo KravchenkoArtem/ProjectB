@@ -5,7 +5,7 @@ using UnityEngine;
 public class TargetMoveLevel : Level
 {
     public int numMoves = 0;
-    public Tile.CakeType cakeType;
+    private Tile.CakeType cakeType;
 
     private int movesUsed = 0;
     [SerializeField]
@@ -16,6 +16,8 @@ public class TargetMoveLevel : Level
     private void Start()
     {
         type = LevelType.TARGETMOVES;
+
+        cakeType = RandomizeCakeType();
 
         hud.SetLevelType(type);
         hud.SetScore(currentScore);
