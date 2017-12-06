@@ -34,4 +34,10 @@ public class ScoreMoveLevel : Level
             GameWin();
         }
     }
+
+    public override void OnBombDetonate()
+    {
+        movesUsed++;
+        hud.SetRemaining(numMoves - movesUsed);
+    }
 }

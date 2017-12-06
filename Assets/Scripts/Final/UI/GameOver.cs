@@ -13,8 +13,10 @@ public class GameOver : MonoBehaviour
     public Text BestScoreText;
     public Image GameOverTitle;
     public Button playButton;
+    private bool didWin = false;
 
-    LevelManager levelManger;
+    private LevelManager levelManger;
+    private AudioManager audioManager;
 
     private void Start()
     {
@@ -22,6 +24,11 @@ public class GameOver : MonoBehaviour
         if (levelManger == null)
         {
             Debug.LogError("LevelManager not found!");
+        }
+        audioManager = AudioManager.Instance;
+        if (audioManager == null)
+        {
+            Debug.LogError("AudioManager not found!");
         }
         GameOverPanel.SetActive(false);
     }
@@ -34,7 +41,7 @@ public class GameOver : MonoBehaviour
         GameOverTitle.color = Color.red;
         playButton.gameObject.SetActive(false);
 
-        BestScoreText.text = PlayerPrefs.GetInt(SceneManager.GetActiveScene().name, score).ToString();
+        BestScoreText.text = PlayerPrefs.GetInt(SceneManager.GetActiveScene().name).ToString();
 
         ScoreText.text = score.ToString();
     }
@@ -45,7 +52,7 @@ public class GameOver : MonoBehaviour
         GameOverPanel.SetActive(true);
         WinLoseText.text = "Stage is done";
         GameOverTitle.color = Color.white;
-        levelManger.CurLevel++;
+        didWin = true;
         if (levelManger.CurLevel >= levelManger.MaxLevel)
         {
             playButton.gameObject.SetActive(false);
@@ -53,7 +60,6 @@ public class GameOver : MonoBehaviour
         else
         {
             playButton.gameObject.SetActive(true);
-
         }
 
         ScoreText.text = score.ToString();
@@ -67,7 +73,7 @@ public class GameOver : MonoBehaviour
             PlayerPrefs.SetInt(SceneManager.GetActiveScene().name + 1, starCount);
         }
 
-        BestScoreText.text = PlayerPrefs.GetInt(SceneManager.GetActiveScene().name, score).ToString();
+        BestScoreText.text = PlayerPrefs.GetInt(SceneManager.GetActiveScene().name).ToString();
 
         BestScoreText.enabled = false;
         ScoreText.enabled = false;
@@ -91,23 +97,25 @@ public class GameOver : MonoBehaviour
         BestScoreText.enabled = true;
     }
 
-    public void GoToMainMenu()
-    {
-        levelManger.GoToMainMenu();
-    }
-
     public void ClickReplay()
     {
+        audioManager.PlaySound(4);
         levelManger.RestartCurrent();
     }
 
     public void ClickMoveNextLevel()
-    {
+    {   
+        audioManager.PlaySound(4);
         levelManger.GoToNext();
     }
 
-    public void ClickBack()
+    public void GoToMainMenu()
     {
+        if (didWin)
+        {
+            levelManger.CurLevel++;
+        }
+        audioManager.PlaySound(4);
         levelManger.GoToMainMenu();
     }
 }

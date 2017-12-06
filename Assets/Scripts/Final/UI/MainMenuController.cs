@@ -69,6 +69,7 @@ public class MainMenuController : MonoBehaviour
 
     public void ClickPlay()
     {
+        audioManager.PlaySound(4);
         if (animatorCanvasMainMenu)
         {
             levelSelect = true;
@@ -78,6 +79,7 @@ public class MainMenuController : MonoBehaviour
 
     public void ClickBack()
     {
+        audioManager.PlaySound(4);
         if (animatorCanvasMainMenu)
         {
             OptionsSettings.Instance.GetValueUI(sliderMusic.value, sliderSFX.value, toggleSound.isOn);
@@ -105,6 +107,7 @@ public class MainMenuController : MonoBehaviour
 
     public void ClickOptions()
     {
+        audioManager.PlaySound(4);
         if (animatorCanvasMainMenu)
         {
             levelSelect = false;
@@ -114,6 +117,7 @@ public class MainMenuController : MonoBehaviour
 
     public void ClickStartLevel(int num)
     {
+        audioManager.PlaySound(4);
         levelManger.StartLevel(num);
     }
 
@@ -122,23 +126,6 @@ public class MainMenuController : MonoBehaviour
         if (levels != null)
         {
             for (int i = 0; i < levelManger.CurLevel; i++)
-            {
-                Transform Child = levels.transform.GetChild(i);
-                Child.gameObject.SetActive(true);
-                levelSelectInfo[i].BestScoreText.text = PlayerPrefs.GetInt("Level" + (i + 1)).ToString();
-                for (int s = 0; s < PlayerPrefs.GetInt(("Level" + (i + 1)) + 1); s++)
-                {
-                    levelSelectInfo[i].StarCount[s].GetComponent<Image>().enabled = true;
-                }
-            }
-        }
-    }
-
-    public void UnlockLevel(int cur)
-    {
-        if (levels != null)
-        {
-            for (int i = 0; i < cur; i++)
             {
                 Transform Child = levels.transform.GetChild(i);
                 Child.gameObject.SetActive(true);
@@ -168,6 +155,7 @@ public class MainMenuController : MonoBehaviour
 
     public void ClickQuit()
     {
+        audioManager.PlaySound(4);
         Application.Quit();
     }
 }

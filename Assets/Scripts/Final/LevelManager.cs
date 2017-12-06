@@ -7,7 +7,7 @@ public class LevelManager : MonoBehaviour
 {
     public static LevelManager Instance;
 
-    [SerializeField]
+    [HideInInspector]
     public int CurLevel;
     public int MaxLevel { get; private set; }
 
@@ -25,10 +25,13 @@ public class LevelManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(this);
         }
-
+        
         CurLevel = PlayerPrefs.GetInt("CurLevel");
         MaxLevel = 8;
-
+        if (CurLevel <= 0)
+        {
+            PlayerPrefs.SetInt("CurLevel", 1);
+        }
         UpdateData(PlayerPrefs.GetInt("CurLevel"), 8);
     }
 
@@ -36,6 +39,7 @@ public class LevelManager : MonoBehaviour
     {
         if (CurLevel < MaxLevel)
         {
+            CurLevel++;
             string name = "Level" + CurLevel;
             PlayerPrefs.SetInt("CurLevel", CurLevel);
             UpdateData(CurLevel, MaxLevel);
@@ -49,7 +53,6 @@ public class LevelManager : MonoBehaviour
 
     public void StartLevel(int num)
     {
-        CurLevel = num;
         string name = "Level" + num;
         PlayerPrefs.SetInt("CurLevel", num);
         SceneManager.LoadScene(name);
@@ -63,8 +66,7 @@ public class LevelManager : MonoBehaviour
 
     public void RestartCurrent()
     {
-        string name = "Level" + CurLevel;
-        SceneManager.LoadScene(name);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void GoToMainMenu()

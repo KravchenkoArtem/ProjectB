@@ -151,7 +151,7 @@ public class Tile : MonoBehaviour
     {
         if (animator)
         {
-            animator.Play(clearAnimation.name, -1, 0);
+            animator.Play(clearAnimation.name);
             yield return new WaitForSeconds(clearAnimation.length);
             Destroy(gameObject);
         }

@@ -9,9 +9,9 @@ public class TargetMoveLevel : Level
 
     private int movesUsed = 0;
     [SerializeField]
-    private int TargetCakesLeft = 10;
+    private int targetCakesLeft = 10;
     [SerializeField]
-    public int NumTargetLeft { get { return TargetCakesLeft; } set { TargetCakesLeft = Mathf.Clamp(value, 0, TargetCakesLeft); } }
+    public int NumTargetLeft { get { return targetCakesLeft; } set { targetCakesLeft = Mathf.Clamp(value, 0, targetCakesLeft); } }
 
     private void Start()
     {
@@ -38,20 +38,30 @@ public class TargetMoveLevel : Level
         }
     }
 
+    public override void OnBombDetonate()
+    {
+        movesUsed++;
+        hud.SetRemaining(numMoves - movesUsed);
+    }
+
     public override void OnTileCleared(Tile tile)
     {
         base.OnTileCleared(tile);
 
-        if (cakeType == tile.Cake)
+        if (!TimeOut)
         {
-            NumTargetLeft--;
-            hud.SetTarget(NumTargetLeft);
-
-            if (NumTargetLeft == 0)
+            if (cakeType == tile.Cake)
             {
-                currentScore += 30 * (numMoves - movesUsed);
-                hud.SetScore(currentScore);
-                GameWin();
+                NumTargetLeft--;
+                hud.SetTarget(NumTargetLeft);
+
+                if (NumTargetLeft == 0)
+                {
+                    currentScore += 80 * (numMoves - movesUsed);
+                    hud.SetScore(currentScore);
+                    GameWin();
+                    TimeOut = true;
+                }
             }
         }
     }

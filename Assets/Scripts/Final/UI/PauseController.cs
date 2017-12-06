@@ -44,6 +44,7 @@ public class PauseController : MonoBehaviour
 
     public void ClickPauseButton()
     {
+        audioManager.PlaySound(4);
         pauseActive = !pauseActive;
         if (pauseActive)
         {
@@ -60,17 +61,18 @@ public class PauseController : MonoBehaviour
         pauseButton.interactable = false;
         pauseButton.image.enabled = false;
         animator.SetBool("Paused", true);
-        //Time.timeScale = 0;
+
         pauseActive = true;
     }
 
     public void OffPause()
     {
+        audioManager.PlaySound(4);
         pauseButton.interactable = true;
         pauseButton.image.enabled = true;
         animator.SetBool("Options", false);
         animator.SetBool("Paused", false);
-        //Time.timeScale = 1;
+
         pauseActive = false;
     }
 
@@ -91,11 +93,13 @@ public class PauseController : MonoBehaviour
 
     public void TransitionToOptions()
     {
+        audioManager.PlaySound(4);
         animator.SetBool("Options", true);
     }
 
     public void TransitionToPause()
     {
+        audioManager.PlaySound(4);
         OptionsSettings.Instance.GetValueUI(sliderMusic.value, sliderSFX.value, toggleSound.isOn);
         animator.SetBool("Options", false);
     }

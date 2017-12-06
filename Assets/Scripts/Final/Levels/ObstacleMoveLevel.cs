@@ -33,6 +33,12 @@ public class ObstacleMoveLevel : Level
         }
     }
 
+    public override void OnBombDetonate()
+    {
+        movesUsed++;
+        hud.SetRemaining(numMoves - movesUsed);
+    }
+
     public override void OnTileCleared(Tile tile)
     {
         base.OnTileCleared(tile);
@@ -46,7 +52,7 @@ public class ObstacleMoveLevel : Level
 
                 if (countObstacle == 0)
                 {
-                    currentScore += 20 * (numMoves - movesUsed);
+                    currentScore += 80 * (numMoves - movesUsed);
                     hud.SetScore(currentScore);
                     GameWin();
                 }

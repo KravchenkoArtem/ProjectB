@@ -31,6 +31,7 @@ public class Level : MonoBehaviour
 
     protected int currentScore;
     protected bool didWin;
+    public bool TimeOut = false;
 
     private void Awake()
     {
@@ -58,6 +59,8 @@ public class Level : MonoBehaviour
     }
 
     public virtual void OnMove() { }
+
+    public virtual void OnBombDetonate() { }
 
     public virtual void OnTileCleared(Tile tile)
     {

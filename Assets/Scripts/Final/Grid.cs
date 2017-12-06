@@ -64,7 +64,7 @@ public class Grid : MonoBehaviour
 
     [SerializeField]
     [Range(0, 80)]
-    private int probabilitySpawnBomb = 0; 
+    private int probabilitySpawnBomb = 0;
 
     public float FillTime; // время заполнения
 
@@ -74,7 +74,7 @@ public class Grid : MonoBehaviour
     public TilePrefab[] TilePrefabs;
     public GameObject BackgroundPrefab;
     private Dictionary<TileType, GameObject> tilePrefabDict;
-    private Tile[,] tiles;
+    public Tile[,] tiles;
     private List<Tile> goTile = new List<Tile>();
 
     [HideInInspector]
@@ -244,8 +244,6 @@ public class Grid : MonoBehaviour
                                         if (!hasTileAbove)
                                         {
                                             Destroy(diagonalTile.gameObject);
-                                            //ClearTile(diagonalTile.X, diagonalTile.Y, goEmpty);
-                                            //tiles[tileBelow.X, tileBelow.Y].Clear(goEmpty);
                                             tile.Move(diagX, y + 1, FillTime);
                                             tiles[diagX, y + 1] = tile;
                                             SpawnNewTile(x, y, TileType.EMPTY);
@@ -266,8 +264,6 @@ public class Grid : MonoBehaviour
             if (tileBelow.Type == TileType.EMPTY)
             {
                 Destroy(tileBelow.gameObject);
-                //ClearTile(tileBelow.X, tileBelow.Y, goEmpty);
-                //tiles[tileBelow.X, tileBelow.Y].Clear(goEmpty);
 
                 if (Random.Range(0, probabilitySpawnBomb) == 1)
                 {
@@ -575,7 +571,7 @@ public class Grid : MonoBehaviour
                     }
                     if (tiles[NearX, y].Type == TileType.BOOMB)
                     {
-                        Level.OnMove();
+                        Level.OnBombDetonate();                        
                         //ClearTile(NearX, y, goBomb);
                         audioManager.PlaySound(3);
                         tiles[NearX, y].Clear();
@@ -605,7 +601,7 @@ public class Grid : MonoBehaviour
                     }
                     if (tiles[x, NearY].Type == TileType.BOOMB)
                     {
-                        Level.OnMove();
+                        Level.OnBombDetonate();
                         audioManager.PlaySound(3);
                         tiles[x, NearY].Clear();
                         goTile.Remove(tiles[x, NearY]);
@@ -678,16 +674,12 @@ public class Grid : MonoBehaviour
 
                 ClearAllValidMatches();
 
-                SelectedTile = null;
-                MovingTile = null;
-
+                sel.Deselect();
+                mov.Deselect();
 
                 StartCoroutine(Fill());
 
-                if (Level.Type != Level.LevelType.SCORETIMER)
-                {
-                    Level.OnMove();
-                }
+                Level.OnMove();
             }
             else
             {

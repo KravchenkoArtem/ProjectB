@@ -13,7 +13,6 @@ public class TargetTimeLevel : Level
 
     public int timeInSeconds;
     private float timer;
-    private bool timeOut = false;
 
     private void Start()
     {
@@ -39,23 +38,24 @@ public class TargetTimeLevel : Level
         }
     }
 
-    public override void OnMove()
+    public override void OnBombDetonate()
     {
         timeInSeconds -= 10;
     }
 
     private void Update()
     {
-        if (!timeOut)
+        if (!TimeOut)
         {
             timer += Time.deltaTime;
             hud.SetRemaining(string.Format("{0}:{1:00}", (int)Mathf.Max((timeInSeconds - timer) / 60, 0), (int)Mathf.Max((timeInSeconds - timer) % 60, 0)));
 
             if (NumTargetLeft <= 0)
             {
-                currentScore += 30 * ((int)(timeInSeconds - timer)/10);
+                currentScore += 10 * ((int)(timeInSeconds - timer) / 60);
                 hud.SetScore(currentScore);
                 GameWin();
+                TimeOut = true;
             }
 
             if (timeInSeconds - timer <= 0 && NumTargetLeft > 0)
