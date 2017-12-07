@@ -75,7 +75,8 @@ public class Grid : MonoBehaviour
     public GameObject BackgroundPrefab;
     private Dictionary<TileType, GameObject> tilePrefabDict;
     public Tile[,] tiles;
-    private List<Tile> goTile = new List<Tile>();
+    [HideInInspector]
+    public List<Tile> goTile = new List<Tile>();
 
     [HideInInspector]
     public Tile SelectedTile;
@@ -536,6 +537,7 @@ public class Grid : MonoBehaviour
         return needsRefill;
     }
 
+
     public bool ClearTile(int x, int y, List<GameObject> list)
     {
         if (tiles[x, y].IsClearable && !tiles[x, y].IsBeginCleared)
@@ -688,52 +690,6 @@ public class Grid : MonoBehaviour
             }
         }
     }
-
-    public void ShuffleButton()
-    {
-        StartCoroutine(ShuffleTile());
-    }
-
-    private IEnumerator ShuffleTile()
-    {
-        bool isShuffle = false;
-        if (!IsFilling && !isShuffle)
-        {
-            audioManager.PlaySound(0);
-            isShuffle = true;
-            for (int i = 0; i < goTile.Count; i++)
-            {
-                int randomIndex = Random.Range(i, goTile.Count);
-
-                Tile a = goTile[i].GetComponent<Tile>();
-                Tile b = goTile[randomIndex].GetComponent<Tile>();
-
-                int tempX = a.X;
-                int tempY = a.Y;
-                TileType tempType = a.Type;
-
-                a.Move(b.X, b.Y, FillTime);
-                b.Move(tempX, tempY, FillTime);
-
-                a.Init(a.X, a.Y, this, a.Type);
-                b.Init(tempX, tempY, this, tempType);
-
-                tiles[a.X, a.Y] = a;
-                tiles[b.X, b.Y] = b;
-            }
-            ClearAllValidMatches();
-
-            SelectedTile = null;
-            MovingTile = null;
-
-            Level.OnMove();
-
-            StartCoroutine(Fill());
-            yield return new WaitForSeconds(FillTime);
-            isShuffle = false;
-        }
-    }
-
 
     public Tile SpawnNewTile(int x, int y, TileType type, List<GameObject> list)
     {
