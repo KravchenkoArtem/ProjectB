@@ -1,22 +1,26 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Shuffle : MonoBehaviour {
-
+public class Shuffle : MonoBehaviour
+{
     Grid grid;
 
     private void Awake()
     {
         grid = Grid.Instance;
     }
-    
+
     public void ClickShuffle()
     {
-        StartCoroutine(ShuffleTile());
+        StartCoroutine(ShuffleTile(true));
     }
 
-    private IEnumerator ShuffleTile()
+    public void ShuffleIfPossibleFalse()
+    {
+        StartCoroutine(ShuffleTile(false));
+    }
+
+    private IEnumerator ShuffleTile(bool onMove)
     {
         bool isShuffle = false;
         if (!grid.IsFilling && !isShuffle)
@@ -34,8 +38,8 @@ public class Shuffle : MonoBehaviour {
                 int tempY = a.Y;
                 Grid.TileType tempType = a.Type;
 
-                a.Move(b.X, b.Y, grid.FillTime);
-                b.Move(tempX, tempY, grid.FillTime);
+                a.Move(b.X, b.Y, grid.FillTime * 1.5f);
+                b.Move(tempX, tempY, grid.FillTime * 1.5f);
 
                 a.Init(a.X, a.Y, grid, a.Type);
                 b.Init(tempX, tempY, grid, tempType);
@@ -49,10 +53,11 @@ public class Shuffle : MonoBehaviour {
             grid.SelectedTile = null;
             grid.MovingTile = null;
 
-            grid.Level.OnMove();
+            if (onMove)
+                grid.Level.OnMove();
 
             StartCoroutine(grid.Fill());
-            yield return new WaitForSeconds(grid.FillTime);
+            yield return new WaitForSeconds(grid.FillTime * 1.5f);
             isShuffle = false;
         }
     }

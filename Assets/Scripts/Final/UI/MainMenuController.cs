@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.Audio;
 
 
 public class MainMenuController : MonoBehaviour
@@ -129,7 +127,7 @@ public class MainMenuController : MonoBehaviour
             {
                 Transform Child = levels.transform.GetChild(i);
                 Child.gameObject.SetActive(true);
-                levelSelectInfo[i].BestScoreText.text = PlayerPrefs.GetInt("Level" + (i + 1)).ToString();
+                levelSelectInfo[i].BestScoreText.text = PlayerPrefs.GetInt("Level" + i).ToString();
                 for (int s = 0; s < PlayerPrefs.GetInt(("Level" + (i + 1)) + 1); s++)
                 {
                     levelSelectInfo[i].StarCount[s].GetComponent<Image>().enabled = true;

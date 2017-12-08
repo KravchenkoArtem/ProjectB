@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+
 public class Grid : MonoBehaviour
 {
     public static Grid Instance;
@@ -156,7 +157,7 @@ public class Grid : MonoBehaviour
                 }
             }
         }
-        PrefabPoolingSystem.Prespawn(tilePrefabDict[TileType.NORMAL], 1);
+        PrefabPoolingSystem.Prespawn(tilePrefabDict[TileType.NORMAL], 20);
         StartCoroutine(Fill());
     }
 
@@ -380,7 +381,6 @@ public class Grid : MonoBehaviour
                             }
                         }
                     }
-
                     if (verticaltiles.Count < 2)
                     {
                         verticaltiles.Clear();

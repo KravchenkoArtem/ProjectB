@@ -6,7 +6,7 @@ public class Tile : MonoBehaviour
 {
     public enum CakeType
     {
-        BLACKCAKE, CROISSANTCAKE, PINKCAKE, REDCAKE, WHITECAKE, BIGCAKE, YELLOWCAKE
+        BLACKCAKE, CROISSANTCAKE, PINKCAKE, REDCAKE, WHITECAKE, BIGCAKE, YELLOWCAKE, NULL
     };
 
     public int score;
@@ -66,7 +66,10 @@ public class Tile : MonoBehaviour
         animator = GetComponent<Animator>();
 
         if (!IsCake)
+        {
+            cake = CakeType.NULL;
             return;
+        }
 
         sprite = GetComponent<SpriteRenderer>();
         cakeSpriteDict = new Dictionary<CakeType, Sprite>();
@@ -130,7 +133,7 @@ public class Tile : MonoBehaviour
     {
         if (animator)
         {
-            animator.Play(clearAnimation.name, -1, 0);
+            animator.Play(clearAnimation.name);
             yield return new WaitForSeconds(clearAnimation.length);
             OnDespawnObject(list);
         }
@@ -218,11 +221,12 @@ public class Tile : MonoBehaviour
     public void Select()
     {
         selector.SetActive(true);
-        animator.Play("SelectorAnim");
+        animator.SetBool("Select", true);
     }
 
     public void Deselect()
     {
+        animator.SetBool("Select", false);
         selector.SetActive(false);
         grid.SelectedTile = null;
         grid.MovingTile = null;
