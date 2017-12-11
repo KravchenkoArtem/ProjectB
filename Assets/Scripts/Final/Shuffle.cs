@@ -27,12 +27,12 @@ public class Shuffle : MonoBehaviour
         {
             AudioManager.Instance.PlaySound(0);
             isShuffle = true;
-            for (int i = 0; i < grid.goTile.Count; i++)
+            for (int i = 0; i < grid.GoTile.Count; i++)
             {
-                int randomIndex = Random.Range(i, grid.goTile.Count);
+                int randomIndex = Random.Range(i, grid.GoTile.Count);
 
-                Tile a = grid.goTile[i].GetComponent<Tile>();
-                Tile b = grid.goTile[randomIndex].GetComponent<Tile>();
+                Tile a = grid.GoTile[i].GetComponent<Tile>();
+                Tile b = grid.GoTile[randomIndex].GetComponent<Tile>();
 
                 int tempX = a.X;
                 int tempY = a.Y;
@@ -44,8 +44,8 @@ public class Shuffle : MonoBehaviour
                 a.Init(a.X, a.Y, grid, a.Type);
                 b.Init(tempX, tempY, grid, tempType);
 
-                grid.tiles[a.X, a.Y] = a;
-                grid.tiles[b.X, b.Y] = b;
+                grid.Tiles[a.X, a.Y] = a;
+                grid.Tiles[b.X, b.Y] = b;
             }
 
             grid.ClearAllValidMatches();

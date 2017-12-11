@@ -10,9 +10,11 @@ public class OptionsSettings : SingletoneAsComponent<OptionsSettings> {
         get { return ((OptionsSettings)_Instance); }
         set { _Instance = value; }
     }
-
+    [HideInInspector]
     public float CurSliderValueMusic;
+    [HideInInspector]
     public float CurSliderValueSFX;
+    [HideInInspector]
     public bool CurToggleValue;
 
     [SerializeField]

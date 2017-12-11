@@ -127,7 +127,7 @@ public class MainMenuController : MonoBehaviour
             {
                 Transform Child = levels.transform.GetChild(i);
                 Child.gameObject.SetActive(true);
-                levelSelectInfo[i].BestScoreText.text = PlayerPrefs.GetInt("Level" + i).ToString();
+                levelSelectInfo[i].BestScoreText.text = PlayerPrefs.GetInt("Level" + (1 + i)).ToString();
                 for (int s = 0; s < PlayerPrefs.GetInt(("Level" + (i + 1)) + 1); s++)
                 {
                     levelSelectInfo[i].StarCount[s].GetComponent<Image>().enabled = true;

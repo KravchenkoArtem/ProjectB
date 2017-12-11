@@ -9,6 +9,7 @@ public class Grid : MonoBehaviour
     public static Grid Instance;
 
     private AudioManager audioManager;
+    private Matching matching;
 
     public enum TileType
     {
@@ -63,10 +64,12 @@ public class Grid : MonoBehaviour
     [SerializeField]
     private float gridOffsetYPosition;
 
+    [Space]
     [SerializeField]
     [Range(0, 80)]
     private int probabilitySpawnBomb = 0;
 
+    [Space]
     public float FillTime; // время заполнения
 
     [HideInInspector]
@@ -75,9 +78,9 @@ public class Grid : MonoBehaviour
     public TilePrefab[] TilePrefabs;
     public GameObject BackgroundPrefab;
     private Dictionary<TileType, GameObject> tilePrefabDict;
-    public Tile[,] tiles;
+    public Tile[,] Tiles;
     [HideInInspector]
-    public List<Tile> goTile = new List<Tile>();
+    public List<Tile> GoTile = new List<Tile>();
 
     [HideInInspector]
     public Tile SelectedTile;
@@ -95,6 +98,7 @@ public class Grid : MonoBehaviour
     {
         Level = GameObject.FindGameObjectWithTag("GM").GetComponent<Level>();
         Instance = GetComponent<Grid>();
+        matching = GetComponent<Matching>();
         audioManager = AudioManager.Instance;
         if (audioManager == null)
         {
@@ -121,7 +125,7 @@ public class Grid : MonoBehaviour
             }
         }
 
-        tiles = new Tile[XSize, YSize];
+        Tiles = new Tile[XSize, YSize];
 
         for (int x = 0; x < XSize; x++)
         {
@@ -151,7 +155,7 @@ public class Grid : MonoBehaviour
                 }
                 GameObject obj = Instantiate(BackgroundPrefab, GetWorldPosition(x, y), Quaternion.identity);
                 obj.transform.parent = transform;
-                if (tiles[x, y] == null)
+                if (Tiles[x, y] == null)
                 {
                     SpawnNewTile(x, y, TileType.EMPTY);
                 }
@@ -192,18 +196,18 @@ public class Grid : MonoBehaviour
                 {
                     x = XSize - 1 - loopX;
                 }
-                Tile tile = tiles[x, y];
+                Tile tile = Tiles[x, y];
                 if (tile.IsMovable)
                 {
-                    Tile tileBelow = tiles[x, y + 1];
+                    Tile tileBelow = Tiles[x, y + 1];
                     if (tileBelow.Type == TileType.EMPTY)
                     {
                         Destroy(tileBelow.gameObject);
                         //ClearTile(tileBelow.X, tileBelow.Y, goEmpty);
-                        //tiles[tileBelow.X, tileBelow.Y].Clear(goEmpty);
+                        //Tiles[tileBelow.X, tileBelow.Y].Clear(goEmpty);
 
                         tile.Move(x, y + 1, FillTime);
-                        tiles[x, y + 1] = tile;
+                        Tiles[x, y + 1] = tile;
                         SpawnNewTile(x, y, TileType.EMPTY);
                         movedTile = true;
                     }
@@ -222,7 +226,7 @@ public class Grid : MonoBehaviour
 
                                 if (diagX >= 0 && diagX < XSize)
                                 {
-                                    Tile diagonalTile = tiles[diagX, y + 1];
+                                    Tile diagonalTile = Tiles[diagX, y + 1];
 
                                     if (diagonalTile.Type == TileType.EMPTY)
                                     {
@@ -230,7 +234,7 @@ public class Grid : MonoBehaviour
 
                                         for (int aboveY = y; aboveY >= 0; aboveY--)
                                         {
-                                            Tile tileAbove = tiles[diagX, aboveY];
+                                            Tile tileAbove = Tiles[diagX, aboveY];
 
                                             if (tileAbove.IsMovable)
                                             {
@@ -247,7 +251,7 @@ public class Grid : MonoBehaviour
                                         {
                                             Destroy(diagonalTile.gameObject);
                                             tile.Move(diagX, y + 1, FillTime);
-                                            tiles[diagX, y + 1] = tile;
+                                            Tiles[diagX, y + 1] = tile;
                                             SpawnNewTile(x, y, TileType.EMPTY);
                                             movedTile = true;
                                             break;
@@ -262,7 +266,7 @@ public class Grid : MonoBehaviour
         }
         for (int x = 0; x < XSize; x++)
         {
-            Tile tileBelow = tiles[x, 0];
+            Tile tileBelow = Tiles[x, 0];
             if (tileBelow.Type == TileType.EMPTY)
             {
                 Destroy(tileBelow.gameObject);
@@ -272,11 +276,11 @@ public class Grid : MonoBehaviour
                     GameObject boombTile = Instantiate(tilePrefabDict[TileType.BOOMB], GetWorldPosition(x, -1), Quaternion.identity);
                     boombTile.transform.parent = transform;
 
-                    goTile.Add(boombTile.GetComponent<Tile>());
+                    GoTile.Add(boombTile.GetComponent<Tile>());
 
-                    tiles[x, 0] = boombTile.GetComponent<Tile>();
-                    tiles[x, 0].Init(x, -1, this, TileType.BOOMB);
-                    tiles[x, 0].Move(x, 0, FillTime);
+                    Tiles[x, 0] = boombTile.GetComponent<Tile>();
+                    Tiles[x, 0].Init(x, -1, this, TileType.BOOMB);
+                    Tiles[x, 0].Move(x, 0, FillTime);
                     movedTile = true;
                 }
                 else
@@ -284,223 +288,17 @@ public class Grid : MonoBehaviour
                     GameObject newTile = SpawnObject(tilePrefabDict[TileType.NORMAL], goNormal, GetWorldPosition(x, -1)); // Instantiate(tilePrefabDict[TileType.NORMAL], GetWorldPosition(x, -1), Quaternion.identity);
                     newTile.transform.parent = transform;
 
-                    goTile.Add(newTile.GetComponent<Tile>());
+                    GoTile.Add(newTile.GetComponent<Tile>());
 
-                    tiles[x, 0] = newTile.GetComponent<Tile>();
-                    tiles[x, 0].Init(x, -1, this, TileType.NORMAL);
-                    tiles[x, 0].Move(x, 0, FillTime);
-                    tiles[x, 0].SetCake((Tile.CakeType)Random.Range(0, tiles[x, 0].NumCakes));
+                    Tiles[x, 0] = newTile.GetComponent<Tile>();
+                    Tiles[x, 0].Init(x, -1, this, TileType.NORMAL);
+                    Tiles[x, 0].Move(x, 0, FillTime);
+                    Tiles[x, 0].SetCake((Tile.CakeType)Random.Range(0, Tiles[x, 0].NumCakes));
                     movedTile = true;
                 }
             }
         }
         return movedTile;
-    }
-
-    public List<Tile> GetMatch(Tile tile, int newX, int newY)
-    {
-        if (tile.IsCake)
-        {
-            Tile.CakeType cake = tile.Cake;
-            List<Tile> horizontalTiles = new List<Tile>();
-            List<Tile> verticaltiles = new List<Tile>();
-            List<Tile> matchingTiles = new List<Tile>();
-
-            horizontalTiles.Add(tile);
-
-            for (int dir = 0; dir <= 1; dir++)
-            {
-                for (int xOffset = 1; xOffset < XSize; xOffset++)
-                {
-                    int x;
-
-                    if (dir == 0)
-                    { // Left
-                        x = newX - xOffset;
-                    }
-                    else
-                    { // Right
-                        x = newX + xOffset;
-                    }
-
-                    if (x < 0 || x >= XSize)
-                    {
-                        break;
-                    }
-
-                    if (tiles[x, newY].IsCake && tiles[x, newY].Cake == cake)
-                    {
-                        horizontalTiles.Add(tiles[x, newY]);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-
-            if (horizontalTiles.Count >= 3)
-            {
-                for (int i = 0; i < horizontalTiles.Count; i++)
-                {
-                    matchingTiles.Add(horizontalTiles[i]);
-                }
-            }
-
-            if (horizontalTiles.Count >= 3)
-            {
-                for (int i = 0; i < horizontalTiles.Count; i++)
-                {
-                    for (int dir = 0; dir <= 1; dir++)
-                    {
-                        for (int yOffset = 1; yOffset < YSize; yOffset++)
-                        {
-                            int y;
-
-                            if (dir == 0)
-                            { // Up
-                                y = newY - yOffset;
-                            }
-                            else
-                            { // Down
-                                y = newY + yOffset;
-                            }
-
-                            if (y < 0 || y >= YSize)
-                            {
-                                break;
-                            }
-
-                            if (tiles[horizontalTiles[i].X, y].IsCake && tiles[horizontalTiles[i].X, y].Cake == cake)
-                            {
-                                verticaltiles.Add(tiles[horizontalTiles[i].X, y]);
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    if (verticaltiles.Count < 2)
-                    {
-                        verticaltiles.Clear();
-                    }
-                    else
-                    {
-                        for (int j = 0; j < verticaltiles.Count; j++)
-                        {
-                            matchingTiles.Add(verticaltiles[j]);
-                        }
-
-                        break;
-                    }
-                }
-            }
-
-            if (matchingTiles.Count >= 3)
-            {
-                return matchingTiles;
-            }
-
-            horizontalTiles.Clear();
-            verticaltiles.Clear();
-            verticaltiles.Add(tile);
-
-            for (int dir = 0; dir <= 1; dir++)
-            {
-                for (int yOffset = 1; yOffset < YSize; yOffset++)
-                {
-                    int y;
-
-                    if (dir == 0)
-                    { // Up
-                        y = newY - yOffset;
-                    }
-                    else
-                    { // Down
-                        y = newY + yOffset;
-                    }
-
-                    if (y < 0 || y >= YSize)
-                    {
-                        break;
-                    }
-
-                    if (tiles[newX, y].IsCake && tiles[newX, y].Cake == cake)
-                    {
-                        verticaltiles.Add(tiles[newX, y]);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-
-            if (verticaltiles.Count >= 3)
-            {
-                for (int i = 0; i < verticaltiles.Count; i++)
-                {
-                    matchingTiles.Add(verticaltiles[i]);
-                }
-            }
-
-            if (verticaltiles.Count >= 3)
-            {
-                for (int i = 0; i < verticaltiles.Count; i++)
-                {
-                    for (int dir = 0; dir <= 1; dir++)
-                    {
-                        for (int xOffset = 1; xOffset < XSize; xOffset++)
-                        {
-                            int x;
-
-                            if (dir == 0)
-                            { // Left
-                                x = newX - xOffset;
-                            }
-                            else
-                            { // Right
-                                x = newX + xOffset;
-                            }
-
-                            if (x < 0 || x >= XSize)
-                            {
-                                break;
-                            }
-
-                            if (tiles[x, verticaltiles[i].Y].IsCake && tiles[x, verticaltiles[i].Y].Cake == cake)
-                            {
-                                horizontalTiles.Add(tiles[x, verticaltiles[i].Y]);
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                    }
-
-                    if (horizontalTiles.Count < 2)
-                    {
-                        horizontalTiles.Clear();
-                    }
-                    else
-                    {
-                        for (int j = 0; j < horizontalTiles.Count; j++)
-                        {
-                            matchingTiles.Add(horizontalTiles[j]);
-                        }
-
-                        break;
-                    }
-                }
-            }
-            if (matchingTiles.Count >= 3)
-            {
-                return matchingTiles;
-            }
-        }
-        return null;
     }
 
     public bool ClearAllValidMatches()
@@ -511,9 +309,9 @@ public class Grid : MonoBehaviour
         {
             for (int x = 0; x < XSize; x++)
             {
-                if (tiles[x, y].IsClearable)
+                if (Tiles[x, y].IsClearable)
                 {
-                    List<Tile> match = GetMatch(tiles[x, y], x, y);
+                    List<Tile> match = matching.GetMatch(Tiles[x, y], x, y);
 
                     if (match != null)
                     {
@@ -540,10 +338,10 @@ public class Grid : MonoBehaviour
 
     public bool ClearTile(int x, int y, List<GameObject> list)
     {
-        if (tiles[x, y].IsClearable && !tiles[x, y].IsBeginCleared)
+        if (Tiles[x, y].IsClearable && !Tiles[x, y].IsBeginCleared)
         {
-            goTile.Remove(tiles[x, y]);
-            tiles[x, y].Clear(list);
+            GoTile.Remove(Tiles[x, y]);
+            Tiles[x, y].Clear(list);
             SpawnNewTile(x, y, TileType.EMPTY);
 
             ClearSpecialTile(x, y);
@@ -558,26 +356,26 @@ public class Grid : MonoBehaviour
         {
             if (NearX != x && NearX >= 0 && NearX < XSize)
             {
-                if (tiles[NearX, y].IsClearable)
+                if (Tiles[NearX, y].IsClearable)
                 {
-                    if (tiles[NearX, y].Type == TileType.ICE)
+                    if (Tiles[NearX, y].Type == TileType.ICE)
                     {
-                        tiles[NearX, y].obstacleDurability -= 1;
-                        tiles[NearX, y].GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
-                        if (tiles[NearX, y].obstacleDurability <= 0)
+                        Tiles[NearX, y].obstacleDurability -= 1;
+                        Tiles[NearX, y].GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
+                        if (Tiles[NearX, y].obstacleDurability <= 0)
                         {
-                            Destroy(tiles[NearX, y].gameObject);
-                            tiles[NearX, y].Clear();
+                            Destroy(Tiles[NearX, y].gameObject);
+                            Tiles[NearX, y].Clear();
                             SpawnNewTile(NearX, y, TileType.EMPTY);
                         }
                     }
-                    if (tiles[NearX, y].Type == TileType.BOOMB)
+                    if (Tiles[NearX, y].Type == TileType.BOOMB)
                     {
                         Level.OnBombDetonate();                        
                         //ClearTile(NearX, y, goBomb);
                         audioManager.PlaySound(3);
-                        tiles[NearX, y].Clear();
-                        goTile.Remove(tiles[NearX, y]);
+                        Tiles[NearX, y].Clear();
+                        GoTile.Remove(Tiles[NearX, y]);
                         SpawnNewTile(NearX, y, TileType.EMPTY);
                     }
                 }
@@ -588,25 +386,25 @@ public class Grid : MonoBehaviour
         {
             if (NearY != y && NearY >= 0 && NearY < YSize)
             {
-                if (tiles[x, NearY].IsClearable)
+                if (Tiles[x, NearY].IsClearable)
                 {
-                    if (tiles[x, NearY].Type == TileType.ICE)
+                    if (Tiles[x, NearY].Type == TileType.ICE)
                     {
-                        tiles[x, NearY].obstacleDurability -= 1;
-                        tiles[x, NearY].GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
-                        if (tiles[x, NearY].obstacleDurability <= 0)
+                        Tiles[x, NearY].obstacleDurability -= 1;
+                        Tiles[x, NearY].GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
+                        if (Tiles[x, NearY].obstacleDurability <= 0)
                         {
-                            tiles[x, NearY].Clear();
-                            goTile.Remove(tiles[x, NearY]);
+                            Tiles[x, NearY].Clear();
+                            GoTile.Remove(Tiles[x, NearY]);
                             SpawnNewTile(x, NearY, TileType.EMPTY);
                         }
                     }
-                    if (tiles[x, NearY].Type == TileType.BOOMB)
+                    if (Tiles[x, NearY].Type == TileType.BOOMB)
                     {
                         Level.OnBombDetonate();
                         audioManager.PlaySound(3);
-                        tiles[x, NearY].Clear();
-                        goTile.Remove(tiles[x, NearY]);
+                        Tiles[x, NearY].Clear();
+                        GoTile.Remove(Tiles[x, NearY]);
                         SpawnNewTile(x, NearY, TileType.EMPTY);
                     }
                 }
@@ -620,7 +418,7 @@ public class Grid : MonoBehaviour
         {
             for (int y = 0; y < YSize; y++)
             {
-                if (tiles[x, y].IsCake && (tiles[x, y].Cake == cake))
+                if (Tiles[x, y].IsCake && (Tiles[x, y].Cake == cake))
                 {
                     ClearTile(x, y, goNormal);
                 }
@@ -640,7 +438,7 @@ public class Grid : MonoBehaviour
 
     public void MovedTile()
     {
-        if (IsNear(SelectedTile, MovingTile) && (GetMatch(SelectedTile, MovingTile.X, MovingTile.Y) != null || GetMatch(MovingTile, SelectedTile.X, SelectedTile.Y) != null))
+        if (matching.TileIsNear(SelectedTile, MovingTile) && (matching.GetMatch(SelectedTile, MovingTile.X, MovingTile.Y) != null || matching.GetMatch(MovingTile, SelectedTile.X, SelectedTile.Y) != null))
         {
             SwapTile(SelectedTile, MovingTile);
         }
@@ -650,12 +448,6 @@ public class Grid : MonoBehaviour
         }
     }
 
-    public bool IsNear(Tile sel, Tile mov)
-    {
-        return (sel.X == mov.X && Mathf.Abs(sel.Y - mov.Y) == 1)
-            || (sel.Y == mov.Y && Mathf.Abs(sel.X - mov.X) == 1);
-    }
-
     public void SwapTile(Tile sel, Tile mov)
     {
         if (GameOver)
@@ -663,10 +455,10 @@ public class Grid : MonoBehaviour
 
         if (sel.IsMovable && mov.IsMovable)
         {
-            tiles[sel.X, sel.Y] = mov;
-            tiles[mov.X, mov.Y] = sel;
+            Tiles[sel.X, sel.Y] = mov;
+            Tiles[mov.X, mov.Y] = sel;
 
-            if (GetMatch(sel, mov.X, mov.Y) != null || GetMatch(mov, sel.X, sel.Y) != null)
+            if (matching.GetMatch(sel, mov.X, mov.Y) != null || matching.GetMatch(mov, sel.X, sel.Y) != null)
             {
                 int selX = sel.X;
                 int selY = sel.Y;
@@ -685,8 +477,8 @@ public class Grid : MonoBehaviour
             }
             else
             {
-                tiles[sel.X, sel.Y] = sel;
-                tiles[mov.X, mov.Y] = sel;
+                Tiles[sel.X, sel.Y] = sel;
+                Tiles[mov.X, mov.Y] = sel;
             }
         }
     }
@@ -696,9 +488,9 @@ public class Grid : MonoBehaviour
         GameObject newTile = SpawnObject(tilePrefabDict[type], list, GetWorldPosition(x, y)); //Instantiate(tilePrefabDict[type], GetWorldPosition(x, y), Quaternion.identity);
         newTile.transform.parent = transform;
 
-        tiles[x, y] = newTile.GetComponent<Tile>();
-        tiles[x, y].Init(x, y, this, type);
-        return tiles[x, y];
+        Tiles[x, y] = newTile.GetComponent<Tile>();
+        Tiles[x, y].Init(x, y, this, type);
+        return Tiles[x, y];
     }
 
     public Tile SpawnNewTile(int x, int y, TileType type)
@@ -706,9 +498,9 @@ public class Grid : MonoBehaviour
         GameObject newTile = Instantiate(tilePrefabDict[type], GetWorldPosition(x, y), Quaternion.identity);
         newTile.transform.parent = transform;
 
-        tiles[x, y] = newTile.GetComponent<Tile>();
-        tiles[x, y].Init(x, y, this, type);
-        return tiles[x, y];
+        Tiles[x, y] = newTile.GetComponent<Tile>();
+        Tiles[x, y].Init(x, y, this, type);
+        return Tiles[x, y];
     }
 
     public Vector2 GetWorldPosition(int x, int y)
@@ -730,9 +522,9 @@ public class Grid : MonoBehaviour
         {
             for (int y = 0; y < YSize; y++)
             {
-                if (tiles[x, y].Type == type)
+                if (Tiles[x, y].Type == type)
                 {
-                    tilesOfType.Add(tiles[x, y]);
+                    tilesOfType.Add(Tiles[x, y]);
                 }
             }
         }
