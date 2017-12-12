@@ -22,7 +22,7 @@ public class Tile : MonoBehaviour
 
     [SerializeField]
     private AnimationClip clearAnimation;
-    Animator animator;
+    private Animator animator;
 
     [SerializeField]
     private GameObject selector;

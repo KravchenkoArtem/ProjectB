@@ -129,7 +129,6 @@ public class Matching : MonoBehaviour
     private bool matchType(int x, int y, Tile.CakeType typeCake, Grid.TileType typeTile)
     {
         if ((x < 0) || (x > grid.XSize - 1) || (y < 0) || (y > grid.YSize - 1)) return false;
-        //if (!grid.Tiles[x, y].IsCake) return false;
         return (grid.Tiles[x, y].Cake == typeCake && grid.Tiles[x,y].Type == typeTile);
     }
     

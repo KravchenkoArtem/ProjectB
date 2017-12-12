@@ -15,8 +15,8 @@ public class MainMenuController : MonoBehaviour
     private LevelSelectInfo[] levelSelectInfo;
 
     private AudioManager audioManager;
-    [SerializeField]
 
+    [SerializeField]
     private LevelManager levelManger;
     private bool levelSelect = false;
 

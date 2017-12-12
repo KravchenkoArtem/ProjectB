@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-
 public class Grid : MonoBehaviour
 {
     public static Grid Instance;
@@ -70,7 +69,7 @@ public class Grid : MonoBehaviour
     private int probabilitySpawnBomb = 0;
 
     [Space]
-    public float FillTime; // время заполнения
+    public float FillTime;
 
     [HideInInspector]
     public Level Level;
@@ -203,8 +202,6 @@ public class Grid : MonoBehaviour
                     if (tileBelow.Type == TileType.EMPTY)
                     {
                         Destroy(tileBelow.gameObject);
-                        //ClearTile(tileBelow.X, tileBelow.Y, goEmpty);
-                        //Tiles[tileBelow.X, tileBelow.Y].Clear(goEmpty);
 
                         tile.Move(x, y + 1, FillTime);
                         Tiles[x, y + 1] = tile;
@@ -285,7 +282,7 @@ public class Grid : MonoBehaviour
                 }
                 else
                 {
-                    GameObject newTile = SpawnObject(tilePrefabDict[TileType.NORMAL], goNormal, GetWorldPosition(x, -1)); // Instantiate(tilePrefabDict[TileType.NORMAL], GetWorldPosition(x, -1), Quaternion.identity);
+                    GameObject newTile = SpawnObject(tilePrefabDict[TileType.NORMAL], goNormal, GetWorldPosition(x, -1));
                     newTile.transform.parent = transform;
 
                     GoTile.Add(newTile.GetComponent<Tile>());
@@ -371,8 +368,7 @@ public class Grid : MonoBehaviour
                     }
                     if (Tiles[NearX, y].Type == TileType.BOOMB)
                     {
-                        Level.OnBombDetonate();                        
-                        //ClearTile(NearX, y, goBomb);
+                        Level.OnBombDetonate();
                         audioManager.PlaySound(3);
                         Tiles[NearX, y].Clear();
                         GoTile.Remove(Tiles[NearX, y]);
@@ -438,7 +434,8 @@ public class Grid : MonoBehaviour
 
     public void MovedTile()
     {
-        if (matching.TileIsNear(SelectedTile, MovingTile) && (matching.GetMatch(SelectedTile, MovingTile.X, MovingTile.Y) != null || matching.GetMatch(MovingTile, SelectedTile.X, SelectedTile.Y) != null))
+        if (matching.TileIsNear(SelectedTile, MovingTile) && (matching.GetMatch(SelectedTile, MovingTile.X, MovingTile.Y) != null
+            || matching.GetMatch(MovingTile, SelectedTile.X, SelectedTile.Y) != null))
         {
             SwapTile(SelectedTile, MovingTile);
         }
@@ -485,7 +482,7 @@ public class Grid : MonoBehaviour
 
     public Tile SpawnNewTile(int x, int y, TileType type, List<GameObject> list)
     {
-        GameObject newTile = SpawnObject(tilePrefabDict[type], list, GetWorldPosition(x, y)); //Instantiate(tilePrefabDict[type], GetWorldPosition(x, y), Quaternion.identity);
+        GameObject newTile = SpawnObject(tilePrefabDict[type], list, GetWorldPosition(x, y));
         newTile.transform.parent = transform;
 
         Tiles[x, y] = newTile.GetComponent<Tile>();

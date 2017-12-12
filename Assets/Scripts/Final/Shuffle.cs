@@ -7,7 +7,7 @@ public class Shuffle : MonoBehaviour
 
     private void Awake()
     {
-        grid = Grid.Instance;
+        grid = GetComponent<Grid>();
     }
 
     public void ClickShuffle()

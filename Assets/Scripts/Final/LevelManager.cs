@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
@@ -25,7 +23,7 @@ public class LevelManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(this);
         }
-        
+
         CurLevel = PlayerPrefs.GetInt("CurLevel");
         MaxLevel = 8;
         if (CurLevel <= 0)

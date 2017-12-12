@@ -19,7 +19,7 @@ public class PlaneController : MonoBehaviour
 
     private void Update()
     {
-        _angle += RotateSpeed * Time.deltaTime; // opposite -=
+        _angle += RotateSpeed * Time.deltaTime; 
 
         var offset = new Vector3(Mathf.Sin(_angle), Mathf.Cos(_angle)) * Radius;
 

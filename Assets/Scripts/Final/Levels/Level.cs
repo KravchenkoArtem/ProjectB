@@ -1,11 +1,9 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Random = System.Random;
 
 public class Level : MonoBehaviour
 {
-    // Target - Score, Obstacle, TargetCake. // Сonstraints - Moves, Timer.
     public enum LevelType
     {
         OBSTACLETIMER,
@@ -18,6 +16,7 @@ public class Level : MonoBehaviour
 
     protected Grid grid;
     protected HUD hud;
+    protected XpBarScript xp;
 
     public int Score1Star;
     public int Score2Star;
@@ -37,6 +36,7 @@ public class Level : MonoBehaviour
     {
         grid = GameObject.FindGameObjectWithTag("Grid").GetComponent<Grid>();
         hud = GameObject.FindGameObjectWithTag("HUD").GetComponent<HUD>();
+        xp = hud.gameObject.transform.GetChild(3).GetComponent<XpBarScript>();
     }
 
     private void Start()
@@ -64,6 +64,7 @@ public class Level : MonoBehaviour
 
     public virtual void OnTileCleared(Tile tile)
     {
+        xp.AddXp(tile.score / 2);
         currentScore += tile.score;
         hud.SetScore(currentScore);
     }
@@ -86,7 +87,9 @@ public class Level : MonoBehaviour
 
     public Tile.CakeType RandomizeCakeType()
     {
-        Tile.CakeType[] cakes = { Tile.CakeType.BIGCAKE, Tile.CakeType.BLACKCAKE, Tile.CakeType.CROISSANTCAKE, Tile.CakeType.PINKCAKE, Tile.CakeType.REDCAKE, Tile.CakeType.WHITECAKE, Tile.CakeType.YELLOWCAKE };
+        Tile.CakeType[] cakes = { Tile.CakeType.BIGCAKE, Tile.CakeType.BLACKCAKE,
+            Tile.CakeType.CROISSANTCAKE, Tile.CakeType.PINKCAKE, Tile.CakeType.REDCAKE,
+            Tile.CakeType.WHITECAKE, Tile.CakeType.YELLOWCAKE };
         Random random = new Random();
         return cakes[random.Next(cakes.Length)];
     }
